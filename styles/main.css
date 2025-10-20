@@ -1,0 +1,31 @@
+body, html { margin: 0; height: 100%; }
+#map { height: 100vh; width: 100%; }
+
+#searchbar-conatiner{
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    background: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+#searchbar{
+    border: none;
+    outline: none;
+    width: 250px;
+}
+#searchbar:focus {
+  border-color: #4caf50;
+  background-color: #f9fff9;
+}
+#searchbar.error {
+  border-color: #e53935; 
+  background-color: #ffe5e5; 
+}
+#searchbar::placeholder {
+  color: #999;
+  font-style: italic;
+}
