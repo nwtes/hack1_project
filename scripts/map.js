@@ -1,6 +1,7 @@
 // Create map
     const map = L.map('map').setView([20, 0], 2);
     let listOfCountries = {}
+    let infoAboutCountries = {}
     let input = document.getElementById('searchbar')
     let geojson;
     // Add OpenStreetMap tiles
@@ -31,6 +32,36 @@
           }
         }).addTo(map);
       });
+    // Initializing info about countries
+    fetch('https://restcountries.com/v3.1/all?fields=name,capital,region,subregion,population,area,languages,currencies,flags,timezones').then(res => {
+        if(!res.ok) throw new Error("Failed to fetch data about countries")
+            return res.json()
+    })
+    .then(data=> {
+        console.log(data)
+        data.forEach(country => {
+            const name = country.name?.common;
+            infoAboutCountries[name] = {
+                country: name || 'Unknown',
+                capital: country.capital?.[0] || 'Unknown',
+                region: country.region || 'Unknown',
+                subregion: country.subregion || 'Unknown',
+                population: country.population?.toLocaleString() || 'Unknown',
+                area: country.area?.toLocaleString() + " km" || 'Unknown',
+                languages: country.languages ? Object.values(country.languages).join(", ")
+                : 'Unkonwn',
+                currencies: country.currencies
+                ? Object.values(country.currencies)
+                .map(c => name)
+                .join(", ") : "Unknown",
+                timezones: country.timezones ? Object.values(country.timezones).join(", ")
+                : "Unknown"
+            }
+            console.log(infoAboutCountries[name])
+        })
+        
+    })  
+
     input.addEventListener('keydown' , (e) => {
         if(e.key == 'Enter'){
             layer = listOfCountries[capitalize(input.value)]
@@ -69,4 +100,7 @@
         const firstCap = first.toUpperCase()
         const remain = s.slice(1)
         return firstCap + remain
+    }
+    function fillTemplate(template, data) {
+        return template.replace(/{(\w+)}/g, (_, key) => data[key] || "");
     }
