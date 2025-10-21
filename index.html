@@ -11,7 +11,19 @@
     <input type="text" id="searchbar" placeholder="Search for a country">
   </div>
   <div id="map"></div>
+ <div class="card" id="infoCard">
+    <button class="close-btn" id="closeCard">&times;</button>
+    <h2>Country Details</h2>
+    <p>
+      Here you can show country-related info, population data, or any text you want.
+      The card takes up 80% of the screen width and is rounded with a modern design.
+    </p>
+  </div>
 
+  <button class="show-btn" id="showButton">Guess The Country</button>
+
+  <!-- Script related to bottom card -->
+   <script src="./scripts/card.js"></script>
   <!-- Loading map -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <!-- Loading map script -->

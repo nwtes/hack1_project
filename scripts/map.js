@@ -1,5 +1,20 @@
 // Create map
     const map = L.map('map').setView([20, 0], 2);
+    const card = document.getElementById("infoCard");
+    const showBtn = document.getElementById("showButton");
+    const closeBtn = document.getElementById("closeCard");
+    const questionTemplates = [
+        "Which country has {capital} as its capital and is located in {region}?",
+        "The country that uses {currencies} as its currency and speaks {languages} is known as what?",
+        "Which nation lies in {subregion} and operates in the timezone {timezones}?",
+        "The country with a population of around {population} and an area of {area} is called what?",
+        "Which country is in the {region} region and has {languages} as its main language?",
+        "Identify the country located in {subregion} that uses {currencies} as its currency.",
+        "The nation whose capital is {capital} and timezone is {timezones} is which country?",
+        "Which country speaks {languages} and belongs to the {region} region?",
+        "The country that has {capital} as its capital and primarily uses {currencies} is what?",
+        "A country in {region} with a population close to {population} is known as what?"
+    ];
     let listOfCountries = {}
     let infoAboutCountries = {}
     let input = document.getElementById('searchbar')
@@ -104,3 +119,13 @@
     function fillTemplate(template, data) {
         return template.replace(/{(\w+)}/g, (_, key) => data[key] || "");
     }
+
+    showBtn.addEventListener("click", () => {
+        card.classList.add("show");
+        showBtn.style.display = "none";
+    });
+
+    closeBtn.addEventListener("click", () => {
+        card.classList.remove("show");
+        showBtn.style.display = "block";
+    });
