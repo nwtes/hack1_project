@@ -1,0 +1,4 @@
+1.Add visual feedback to question
+2.sanitize input and output of question generation system
+3.add info about countrues in separate card, generate quesion if feasible 
+4.Ask ai for expansion tips

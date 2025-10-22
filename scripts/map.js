@@ -3,6 +3,7 @@
     const card = document.getElementById("infoCard");
     const showBtn = document.getElementById("showButton");
     const closeBtn = document.getElementById("closeCard");
+    const guessedCountries= []
     const questionTemplates = [
         "Which country has {capital} as its capital and is located in {region}?",
         "The country that uses {currencies} as its currency and speaks {languages} is known as what?",
@@ -19,6 +20,7 @@
     let isGuessing = false
     let listOfCountries = {}
     let namesOfCountries = []
+    let guesses = 0
     let infoAboutCountries = {}
     let input = document.getElementById('searchbar')
     let geojson;
@@ -41,12 +43,27 @@
           onEachFeature: (feature, layer) => {
             namesOfCountries.push(feature.properties.name)
             listOfCountries[feature.properties.name] = layer
+            layer._permanent = false
+            const onMouseOut = (e) => {
+                const layer = e.target
+                if(layer._permanent) return
+                resetCountry(e)
+            };
+
+            const onMouseOn = (e) => {
+            if (isGuessing) {
+                // during guessing, avoid hover visual noise
+                return;
+            } else {
+                highlightCountry(e);
+            }
+            };
             layer.on(
-                {
-                    mouseover: highlightCountry,
-                    mouseout: resetCountry,
-                    click: () => clickCountry(feature,layer)
-                }
+            {
+                mouseover: onMouseOn,
+                mouseout: onMouseOut,
+                click: () => clickCountry(feature,layer)
+            }
             );
           }
         }).addTo(map);
@@ -109,16 +126,33 @@
         const layer = e.target
         geojson.resetStyle(layer)
     }
+    function resetCountryBylayer(layer){
+        geojson.resetStyle(layer)
+    }
     function clickCountry(feature,layer){
         //const layer = e.target
         if(!isGuessing){
             console.log(feature.properties.name)
             map.fitBounds(layer.getBounds(),{animate: true})
         }else{
-            if(feature.properties.name == currentAnswer){
-                console.log("Player guessed: " + feature.properties.name)
+            
+            if(guesses <= 5){
+                if(feature.properties.name == currentAnswer){
+                guessedCountries.push(layer)
+                layer._permanent = true
+                layer.setStyle({
+                    color: 'green', weight: 1, fillOpacity: 0.2
+                })
+                }else{
+                    guesses++
+                    guessedCountries.push(layer)
+                    layer._permanent = true
+                    layer.setStyle({
+                        color: 'red', weight: 1, fillOpacity: 0.2
+                    })
+                }
             }else{
-                console.log("Wrong answer, correct answer is: " + currentAnswer)
+                //handle not guessing in 5 times
             }
         }
     }
@@ -146,8 +180,13 @@
         qaPair[1] = country_info.country
         return qaPair
     }
-
-
+    function closeCard(){
+        currentAnswer = null
+        isGuessing = false
+        card.classList.remove("show");
+        showBtn.style.display = "block";
+    }
+    // Card listeners
     showBtn.addEventListener("click", () => {
         isGuessing = true  
         card.classList.add("show");
@@ -158,8 +197,8 @@
     });
 
     closeBtn.addEventListener("click", () => {
-        currentAnswer = null
-        isGuessing = false
-        card.classList.remove("show");
-        showBtn.style.display = "block";
+        guessedCountries.forEach((layer) => {
+            resetCountryBylayer(layer)
+        })
+        closeCard()
     });
