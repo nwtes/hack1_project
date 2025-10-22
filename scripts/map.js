@@ -1,8 +1,11 @@
 // Create map
     const map = L.map('map').setView([20, 0], 2);
     const card = document.getElementById("infoCard");
+    const sidecard = document.getElementById("countryCard");
+    const showSideBtn = document.getElementById("showSideButton");
     const showBtn = document.getElementById("showButton");
     const closeBtn = document.getElementById("closeCard");
+    const closeSideBtn = document.getElementById("closeSideCard");
     let guessedCountries= []
     const questionTemplates = [
         "Which country has {capital} as its capital and is located in {region}?",
@@ -70,7 +73,7 @@
         }).addTo(map);
       });
     // Initializing info about countries
-    fetch('https://restcountries.com/v3.1/all?fields=name,capital,region,subregion,population,area,languages,currencies,cca3,timezones').then(res => {
+    fetch('https://restcountries.com/v3.1/all?fields=name,capital,region,borders,population,area,languages,currencies,cca3,timezones').then(res => {
         if(!res.ok) throw new Error("Failed to fetch data about countries")
             return res.json()
     })
@@ -82,11 +85,13 @@
                 country: country.name.common || 'Unknown',
                 capital: country.capital?.[0] || 'Unknown',
                 region: country.region || 'Unknown',
-                subregion: country.subregion || 'Unknown',
+                borders: Array.isArray(country.borders) && country.borders.length > 0
+                ? country.borders.join(", ")
+                : "noone",
                 population: country.population?.toLocaleString() || 'Unknown',
                 area: country.area?.toLocaleString() + " km" || 'Unknown',
                 languages: country.languages ? Object.values(country.languages).join(", ")
-                : 'Unkonwn',
+                : 'Unknown',
                 cca3: cca3 || 'Unknown',
                 currencies: country.currencies
                 ? Object.values(country.currencies)
@@ -95,7 +100,7 @@
                 timezones: country.timezones ? Object.values(country.timezones).join(", ")
                 : "Unknown"
             }
-            console.log(country.cca3)
+            console.log(country.cca3 + " borders with " + infoAboutCountries[cca3].borders) 
             //console.log(infoAboutCountries[name])
         })
         
@@ -138,6 +143,7 @@
         if(!isGuessing){
             console.log(feature.properties.name)
             map.fitBounds(layer.getBounds(),{animate: true})
+            openCountryCard(feature)
         }else{
             
             if(guesses <= 4){
@@ -147,6 +153,8 @@
                     layer.setStyle({
                         color: 'green', weight: 1, fillOpacity: 0.2
                     })
+                    closeCard()
+                    alert("You're correct")
                 }else{
                     guesses++
                     guessedCountries.push(layer)
@@ -163,15 +171,21 @@
         }
     }
     function capitalize(s){
+        const remain = s.slice(1)
         const first = s.charAt(0)
         const firstCap = first.toUpperCase()
-        const remain = s.slice(1)
         return firstCap + remain
     }
     function fillTemplate(template, data) {
         return template.replace(/{(\w+)}/g, (_, key) => data[key] || "Unknown");
     }
-
+    function openCountryCard(feature){
+        //Add correct data here
+        sidecard.classList.add("show")
+        document.getElementById("countryName").textContent = feature.properties.name
+        document.getElementById("capital").textContent = feature.properties.capital
+        document.getElementById("population").textContent = feature.properties.population
+    }
     function generateRandomQuestion(){
         const i_country = Math.floor(Math.random() * namesOfCountries.length);
         const i_question = Math.floor(Math.random() * questionTemplates.length);
@@ -209,3 +223,12 @@
     closeBtn.addEventListener("click", () => { 
         closeCard()
     });
+
+    showSideBtn.addEventListener("click", () => {
+        //sidecard.classList.add("show")
+        showSideButton.style.display("none")
+    })
+    closeSideBtn.addEventListener("click" , () => {
+        sidecard.classList.remove("show");
+        showSideBtn.style.display("block")
+    })
