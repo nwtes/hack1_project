@@ -3,7 +3,7 @@
     const card = document.getElementById("infoCard");
     const showBtn = document.getElementById("showButton");
     const closeBtn = document.getElementById("closeCard");
-    const guessedCountries= []
+    let guessedCountries= []
     const questionTemplates = [
         "Which country has {capital} as its capital and is located in {region}?",
         "The country that uses {currencies} as its currency and speaks {languages} is known as what?",
@@ -41,7 +41,8 @@
         geojson = L.geoJSON(data, {
           style: { weight:0, fillOpacity:0 },
           onEachFeature: (feature, layer) => {
-            namesOfCountries.push(feature.properties.name)
+            if(!feature.properties.iso_a3) feature.properties.iso_a3 = 'Unknown'
+            namesOfCountries.push(feature.properties.iso_a3)
             listOfCountries[feature.properties.name] = layer
             layer._permanent = false
             const onMouseOut = (e) => {
@@ -69,16 +70,16 @@
         }).addTo(map);
       });
     // Initializing info about countries
-    fetch('https://restcountries.com/v3.1/all?fields=name,capital,region,subregion,population,area,languages,currencies,flags,timezones').then(res => {
+    fetch('https://restcountries.com/v3.1/all?fields=name,capital,region,subregion,population,area,languages,currencies,cca3,timezones').then(res => {
         if(!res.ok) throw new Error("Failed to fetch data about countries")
             return res.json()
     })
     .then(data=> {
         console.log(data)
         data.forEach(country => {
-            const name = country.name?.common;
-            infoAboutCountries[name] = {
-                country: name || 'Unknown',
+            const cca3 = country.cca3;
+            infoAboutCountries[cca3] = {
+                country: country.name.common || 'Unknown',
                 capital: country.capital?.[0] || 'Unknown',
                 region: country.region || 'Unknown',
                 subregion: country.subregion || 'Unknown',
@@ -86,6 +87,7 @@
                 area: country.area?.toLocaleString() + " km" || 'Unknown',
                 languages: country.languages ? Object.values(country.languages).join(", ")
                 : 'Unkonwn',
+                cca3: cca3 || 'Unknown',
                 currencies: country.currencies
                 ? Object.values(country.currencies)
                 .map(c => c.name)
@@ -93,6 +95,7 @@
                 timezones: country.timezones ? Object.values(country.timezones).join(", ")
                 : "Unknown"
             }
+            console.log(country.cca3)
             //console.log(infoAboutCountries[name])
         })
         
@@ -100,7 +103,8 @@
 
     input.addEventListener('keydown' , (e) => {
         if(e.key == 'Enter'){
-            layer = listOfCountries[capitalize(input.value)]
+            text = input.value
+            layer = listOfCountries[capitalize(text.toLowerCase())]
             if (layer == null){
                 console.log('Not found')
             }else{
@@ -136,13 +140,13 @@
             map.fitBounds(layer.getBounds(),{animate: true})
         }else{
             
-            if(guesses <= 5){
+            if(guesses <= 4){
                 if(feature.properties.name == currentAnswer){
-                guessedCountries.push(layer)
-                layer._permanent = true
-                layer.setStyle({
-                    color: 'green', weight: 1, fillOpacity: 0.2
-                })
+                    guessedCountries.push(layer)
+                    layer._permanent = true
+                    layer.setStyle({
+                        color: 'green', weight: 1, fillOpacity: 0.2
+                    })
                 }else{
                     guesses++
                     guessedCountries.push(layer)
@@ -153,6 +157,8 @@
                 }
             }else{
                 //handle not guessing in 5 times
+                alert('You failed to guess the correct country')
+                closeCard()
             }
         }
     }
@@ -185,6 +191,10 @@
         isGuessing = false
         card.classList.remove("show");
         showBtn.style.display = "block";
+        guessedCountries.forEach((layer) => {
+            resetCountryBylayer(layer)
+        })
+        guessedCountries = []
     }
     // Card listeners
     showBtn.addEventListener("click", () => {
@@ -196,9 +206,6 @@
         currentAnswer = question[1]
     });
 
-    closeBtn.addEventListener("click", () => {
-        guessedCountries.forEach((layer) => {
-            resetCountryBylayer(layer)
-        })
+    closeBtn.addEventListener("click", () => { 
         closeCard()
     });
