@@ -27,10 +27,11 @@
   <button class="show-btn" id="showButton">Guess The Country</button>
 
   <!-- Script related to bottom card -->
-   <script src="./scripts/card.js"></script>
-  <!-- Loading map -->
+  <!-- Load Leaflet first so `L` is available to the map scripts -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <!-- Loading map script -->
-  <script src="./scripts/map.js"></script>
+  <script src="scripts/map-init.js"></script>
+  <script src="scripts/geo-data.js"></script>
+  <script src="scripts/map-interactions.js"></script>
+  
 </body>
 </html>
