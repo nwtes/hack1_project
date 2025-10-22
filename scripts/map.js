@@ -15,7 +15,10 @@
         "The country that has {capital} as its capital and primarily uses {currencies} is what?",
         "A country in {region} with a population close to {population} is known as what?"
     ];
+    let currentAnswer = null
+    let isGuessing = false
     let listOfCountries = {}
+    let namesOfCountries = []
     let infoAboutCountries = {}
     let input = document.getElementById('searchbar')
     let geojson;
@@ -36,6 +39,7 @@
         geojson = L.geoJSON(data, {
           style: { weight:0, fillOpacity:0 },
           onEachFeature: (feature, layer) => {
+            namesOfCountries.push(feature.properties.name)
             listOfCountries[feature.properties.name] = layer
             layer.on(
                 {
@@ -67,12 +71,12 @@
                 : 'Unkonwn',
                 currencies: country.currencies
                 ? Object.values(country.currencies)
-                .map(c => name)
+                .map(c => c.name)
                 .join(", ") : "Unknown",
                 timezones: country.timezones ? Object.values(country.timezones).join(", ")
                 : "Unknown"
             }
-            console.log(infoAboutCountries[name])
+            //console.log(infoAboutCountries[name])
         })
         
     })  
@@ -107,8 +111,16 @@
     }
     function clickCountry(feature,layer){
         //const layer = e.target
-        console.log(feature.properties.name)
-        map.fitBounds(layer.getBounds(),{animate: true})
+        if(!isGuessing){
+            console.log(feature.properties.name)
+            map.fitBounds(layer.getBounds(),{animate: true})
+        }else{
+            if(feature.properties.name == currentAnswer){
+                console.log("Player guessed: " + feature.properties.name)
+            }else{
+                console.log("Wrong answer, correct answer is: " + currentAnswer)
+            }
+        }
     }
     function capitalize(s){
         const first = s.charAt(0)
@@ -117,15 +129,37 @@
         return firstCap + remain
     }
     function fillTemplate(template, data) {
-        return template.replace(/{(\w+)}/g, (_, key) => data[key] || "");
+        return template.replace(/{(\w+)}/g, (_, key) => data[key] || "Unknown");
     }
 
+    function generateRandomQuestion(){
+        const i_country = Math.floor(Math.random() * namesOfCountries.length);
+        const i_question = Math.floor(Math.random() * questionTemplates.length);
+        const qaPair = []
+        const template = questionTemplates[i_question]
+        const country = namesOfCountries[i_country]
+        const country_info = infoAboutCountries[country]
+        let question = fillTemplate(template,country_info)
+
+        
+        qaPair[0] = question
+        qaPair[1] = country_info.country
+        return qaPair
+    }
+
+
     showBtn.addEventListener("click", () => {
+        isGuessing = true  
         card.classList.add("show");
         showBtn.style.display = "none";
+        question = generateRandomQuestion()
+        document.getElementById("card-text").textContent = question[0]
+        currentAnswer = question[1]
     });
 
     closeBtn.addEventListener("click", () => {
+        currentAnswer = null
+        isGuessing = false
         card.classList.remove("show");
         showBtn.style.display = "block";
     });

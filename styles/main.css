@@ -1,10 +1,17 @@
+:root{
+  --bg-gradient: linear-gradient(180deg,#eaf3ff 0%, #f6fbff 100%);
+  --accent: #2d6cdf;
+  --muted: #48627a;
+  --card-shadow: 0 -12px 30px rgba(45,108,223,0.12);
+  --card-border: rgba(45,108,223,0.12);
+}
+
 html, body {
   height: 100%;
   margin: 0;
   font-family: system-ui, "Segoe UI", Roboto, Arial, sans-serif;
 }
 
-/* map fills viewport */
 #map {
   position: fixed;
   top: 0;
@@ -20,7 +27,6 @@ html, body {
   height: 100%;
 }
 
-/* searchbar centered at the top */
 #searchbar-conatiner {
   position: absolute;
   top: 12px;
@@ -40,63 +46,104 @@ html, body {
   outline: none;
 }
 
-/* sliding card from bottom, 20% of viewport height, rounded top corners only, bottom flush */
 .card {
   position: fixed;
   left: 50%;
   bottom: 0;
-  transform: translate(-50%, 100%); /* hidden below viewport */
+  transform: translate(-50%, 100%);
   width: 90%;
   max-width: 1200px;
-  height: 20vh; /* 20 percent of viewport height */
-  background: #ffffff;
-  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.20);
-  border-radius: 12px 12px 0 0; /* rounded top corners only */
+  height: 20vh;
+  min-height: 140px;
+  background: var(--bg-gradient);
+  box-shadow: var(--card-shadow);
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
+  border-top: 1px solid var(--card-border);
   transition: transform 320ms cubic-bezier(.2,.9,.2,1);
-  z-index: 5000; /* above map */
-  overflow: auto;
-  padding: 16px 18px;
+  z-index: 5000;
+  overflow: hidden;
+  padding: 18px 22px;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  color: var(--muted);
+  backdrop-filter: blur(4px);
 }
 
-/* visible state */
 .card.show {
-  transform: translate(-50%, 0); /* slide up into view */
+  transform: translate(-50%, 0);
 }
 
-/* close button in the top-right corner of the card */
+.card .handle{
+  width: 56px;
+  height: 6px;
+  background: rgba(45,108,223,0.12);
+  border-radius: 6px;
+  margin: 4px auto 10px;
+}
+
+.card h2 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -0.4px;
+  text-align: center;
+}
+
+#card-text {
+  margin: auto 0;
+  font-size: 1.45rem;
+  line-height: 1.6;
+  text-align: center;
+  max-width: 92%;
+  color: #153b51;
+}
+
 .close-btn {
   position: absolute;
   top: 10px;
   right: 10px;
-  width: 34px;
-  height: 34px;
-  border: none;
-  background: transparent;
-  font-size: 24px;
-  line-height: 1;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(0,0,0,0.06);
+  background: rgba(255,255,255,0.9);
+  border-radius: 10px;
+  font-size: 20px;
+  color: var(--accent);
   cursor: pointer;
-  color: #333;
-  z-index: 5050;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 4px 12px rgba(16,40,70,0.06);
 }
 
-/* Show Info button */
+.close-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(29,78,169,0.12);
+}
+
+.card ::-webkit-scrollbar{ height:8px; width:8px; }
+.card ::-webkit-scrollbar-thumb{ background: rgba(45,108,223,0.16); border-radius:6px; }
+.card ::-webkit-scrollbar-track{ background: transparent; }
+
 .show-btn {
   position: fixed;
   right: 16px;
   bottom: 18px;
   z-index: 5200;
   padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: none;
-  background: #1976d2;
+  background: linear-gradient(180deg,var(--accent), #1a4bb8);
   color: #fff;
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  font-weight: 600;
+  box-shadow: 0 8px 20px rgba(29,78,169,0.12);
 }
 
-/* responsive tweak */
-@media (min-width: 900px) {
-  .card { width: 80%; }
+@media (min-width: 900px){
+  .card{ width: 80%; }
+  .card h2{ font-size: 2.25rem; }
+  #card-text{ font-size: 1.6rem; }
 }
