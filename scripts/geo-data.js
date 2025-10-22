@@ -45,6 +45,18 @@
           }
         }).addTo(map);
       });
+// Load manual top pool (optional whitelist of guessable cca3 codes)
+fetch('assets/top65.json')
+  .then(r => r.json())
+  .then(arr => {
+    // store as a Set for faster lookup
+    window.topPool = Array.isArray(arr) ? arr.map(s => String(s).toUpperCase()) : [];
+    console.log('Loaded topPool with', window.topPool.length, 'entries');
+  })
+  .catch(() => {
+    window.topPool = [];
+    console.log('No topPool found or failed to load');
+  });
     // Initializing info about countries
     fetch('https://restcountries.com/v3.1/all?fields=name,capital,region,borders,population,area,languages,currencies,cca3,timezones').then(res => {
         if(!res.ok) throw new Error("Failed to fetch data about countries")

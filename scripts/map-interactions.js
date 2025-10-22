@@ -106,18 +106,42 @@
         document.getElementById("population").textContent = feature.properties.name 
     }
     function generateRandomQuestion(){
-        const i_country = Math.floor(Math.random() * namesOfCountries.length);
         const i_question = Math.floor(Math.random() * questionTemplates.length);
-        const qaPair = []
-        const template = questionTemplates[i_question]
-        const country = namesOfCountries[i_country]
-        const country_info = infoAboutCountries[country]
-        let question = fillTemplate(template,country_info)
+        const qaPair = [];
+        const template = questionTemplates[i_question];
 
-        
-        qaPair[0] = question
-        qaPair[1] = country_info.country
-        return qaPair
+        // Prefer the manual topPool whitelist when present
+        let pickedCca3 = null;
+        if (window.topPool && Array.isArray(window.topPool) && window.topPool.length > 0) {
+            const pick = window.topPool[Math.floor(Math.random() * window.topPool.length)];
+            // Attempt to find a matching entry in namesOfCountries or infoAboutCountries
+            // namesOfCountries contains geojson iso_a3; infoAboutCountries keyed by cca3
+            if (infoAboutCountries && infoAboutCountries[pick]) {
+                pickedCca3 = pick;
+            } else if (namesOfCountries.includes(pick)) {
+                pickedCca3 = pick;
+            } else {
+                // Fallback: try to find a cca3 in infoAboutCountries whose key matches case-insensitively
+                const maybe = Object.keys(infoAboutCountries || {}).find(k => k.toUpperCase() === String(pick).toUpperCase());
+                if (maybe) pickedCca3 = maybe;
+            }
+        }
+
+        // If we didn't get a pickedCca3, fall back to random from namesOfCountries
+        let countryKey;
+        if (pickedCca3) {
+            countryKey = pickedCca3;
+        } else {
+            const i_country = Math.floor(Math.random() * namesOfCountries.length);
+            countryKey = namesOfCountries[i_country];
+        }
+
+        const country_info = infoAboutCountries[countryKey] || { country: countryKey };
+        const question = fillTemplate(template, country_info);
+
+        qaPair[0] = question;
+        qaPair[1] = country_info.country;
+        return qaPair;
     }
     function closeCard(){
         currentAnswer = null
