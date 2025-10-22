@@ -10,7 +10,12 @@
  * NOTE: This file is an exact-origin extract and intentionally does not
  * modify any logic. It relies on globals declared in `map-init.js`.
  */
-    // Initiazlizing world borders and array of countries
+  /**
+   * Initialize world borders layer from local GeoJSON and register per-feature
+   * event handlers (hover, click). Populates `namesOfCountries` and
+   * `listOfCountries` used by the rest of the app.
+   */
+  // Initiazlizing world borders and array of countries
     fetch('assets/custom.geo.json')
       .then(res => res.json())
       .then(data => {
@@ -45,6 +50,11 @@
           }
         }).addTo(map);
       });
+/**
+ * Load manual top pool (optional whitelist of guessable cca3 codes).
+ * When present `window.topPool` will be an array of uppercase cca3 strings
+ * and `generateRandomQuestion` will prefer this pool.
+ */
 // Load manual top pool (optional whitelist of guessable cca3 codes)
 fetch('assets/top65.json')
   .then(r => r.json())

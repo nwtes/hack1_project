@@ -11,6 +11,11 @@
  * modify any logic. It uses globals (e.g. `map`) the rest of the split files
  * expect to exist. Keep this file loaded before the other map scripts.
  */
+/** Globals declared by this file
+ * - map: Leaflet map instance
+ * - card, sidecard, showBtn, showSideBtn, closeBtn, closeSideBtn: DOM elements
+ * - guessedCountries, questionTemplates, currentAnswer, isGuessing, etc.: app state
+ */
 // Create map
     const map = L.map('map').setView([20, 0], 2);
     const card = document.getElementById("infoCard");

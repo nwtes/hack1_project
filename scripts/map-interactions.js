@@ -26,6 +26,12 @@
     )  
    
     
+    /**
+     * highlightCountry
+     * Highlight a country feature visually on mouseover by adjusting style
+     * and bring it to the front so it is visible above neighbouring layers.
+     * @param {Object} e - Leaflet event with `target` layer
+     */
     function highlightCountry(e){
         const layer = e.target
         layer.setStyle(
@@ -35,13 +41,31 @@
         )
         layer.bringToFront()
     }
+    /**
+     * resetCountry
+     * Reset a feature's style to its default appearance (used on mouseout)
+     * @param {Object} e - Leaflet event with `target` layer
+     */
     function resetCountry(e){
         const layer = e.target
         geojson.resetStyle(layer)
     }
+    /**
+     * resetCountryBylayer
+     * Reset the style of the provided layer instance (used when clearing guesses)
+     * @param {L.Layer} layer - Leaflet layer to reset
+     */
     function resetCountryBylayer(layer){
         geojson.resetStyle(layer)
     }
+    /**
+     * clickCountry
+     * Called when a country feature is clicked. If the app is in guessing mode
+     * this checks the guess and applies correct/incorrect styling; otherwise it
+     * opens the country info card and zooms to the feature.
+     * @param {Object} feature - GeoJSON feature object
+     * @param {L.Layer} layer - Leaflet layer for the feature
+     */
     function clickCountry(feature,layer){
         //const layer = e.target
         if(!isGuessing){
@@ -74,12 +98,26 @@
             }
         }
     }
+    /**
+     * capitalize
+     * Capitalize the first character of a string (simple helper used by search)
+     * @param {string} s - input string
+     * @returns {string} capitalized string
+     */
     function capitalize(s){
         const remain = s.slice(1)
         const first = s.charAt(0)
         const firstCap = first.toUpperCase()
         return firstCap + remain
     }
+    /**
+     * fillTemplate
+     * Replace placeholders like {key} in a template string using values from
+     * the provided data object. Missing or null values become "Unknown".
+     * @param {string} template - template with {placeholders}
+     * @param {Object} data - data object to pull values from
+     * @returns {string} filled template
+     */
     function fillTemplate(template, data) {
         // Safe placeholder replacement:
         // - If `data` is falsy, replace every placeholder with 'Unknown'.
@@ -98,6 +136,12 @@
             return String(v);
         });
     }
+    /**
+     * openCountryCard
+     * Populate and display the side card with basic information for the
+     * selected GeoJSON feature.
+     * @param {Object} feature - GeoJSON feature with properties used for display
+     */
     function openCountryCard(feature){
         //Add correct data here
         sidecard.classList.add("show")
@@ -105,6 +149,13 @@
         document.getElementById("capital").textContent = feature.properties.name
         document.getElementById("population").textContent = feature.properties.name 
     }
+    /**
+     * generateRandomQuestion
+     * Create a QA pair by selecting a country (prefer the manual topPool if
+     * available) and filling a random question template with that country's
+     * metadata.
+     * @returns {[string, string]} [questionText, answerText]
+     */
     function generateRandomQuestion(){
         const i_question = Math.floor(Math.random() * questionTemplates.length);
         const qaPair = [];
@@ -143,6 +194,11 @@
         qaPair[1] = country_info.country;
         return qaPair;
     }
+    /**
+     * closeCard
+     * Close the question/info card, reset guessing state and clear any
+     * temporary highlights applied to guessed countries.
+     */
     function closeCard(){
         currentAnswer = null
         isGuessing = false
