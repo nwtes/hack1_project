@@ -141,7 +141,21 @@ html, body {
   font-weight: 600;
   box-shadow: 0 8px 20px rgba(29,78,169,0.12);
 }
+.quiz-btn{
+  left:16px;
+  position: fixed;
+  bottom: 18px;
+  z-index: 5200;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(180deg,var(--accent), #1a4bb8);
+  color: #fff;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 8px 20px rgba(29,78,169,0.12);
 
+}
 .show-side-btn {
   position: fixed;
   left: 16px;

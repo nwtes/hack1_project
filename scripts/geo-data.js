@@ -22,10 +22,10 @@
         geojson = L.geoJSON(data, {
           style: { weight:0, fillOpacity:0 },
           onEachFeature: (feature, layer) => {
-            if(!feature.properties.iso_a3) feature.properties.iso_a3 = 'Unknown'
-            namesOfCountries.push(feature.properties.iso_a3)
-            listOfCountries[feature.properties.name] = layer
-            layer._permanent = false
+            if(!feature.properties.iso_a3) feature.properties.iso_a3 = 'Unknown';
+            namesOfCountries.push(feature.properties.iso_a3);
+            listOfCountries[feature.properties.name] = layer;
+            layer._permanent = false;
             const onMouseOut = (e) => {
                 const layer = e.target
                 if(layer._permanent) return
@@ -33,7 +33,7 @@
             };
 
             const onMouseOn = (e) => {
-            if (isGuessing) {
+        if (isGuessing) {
                 // during guessing, avoid hover visual noise
                 return;
             } else if(openedLayer) {
@@ -53,8 +53,8 @@
                 click: () => clickCountry(feature,layer)
             }
             );
-          }
-        }).addTo(map);
+      }
+    }).addTo(map);
       });
 /**
  * Load manual top pool (optional whitelist of guessable cca3 codes).
@@ -74,13 +74,13 @@ fetch('assets/top65.json')
     console.log('No topPool found or failed to load');
   });
     // Initializing info about countries
-    fetch('https://restcountries.com/v3.1/all?fields=name,capital,region,borders,population,area,languages,currencies,cca3,timezones').then(res => {
-        if(!res.ok) throw new Error("Failed to fetch data about countries")
-            return res.json()
-    })
-    .then(data=> {
-        console.log(data)
-        data.forEach(country => {
+  fetch('https://restcountries.com/v3.1/all?fields=name,capital,region,borders,population,area,languages,currencies,cca3,timezones').then(res => {
+    if(!res.ok) throw new Error("Failed to fetch data about countries");
+      return res.json();
+  })
+  .then(data=> {
+    console.log(data);
+    data.forEach(country => {
             const cca3 = country.cca3;
             infoAboutCountries[cca3] = {
                 country: country.name.common || 'Unknown',
@@ -89,20 +89,20 @@ fetch('assets/top65.json')
                 borders: Array.isArray(country.borders) && country.borders.length > 0
                 ? country.borders.join(", ")
                 : "noone",
-                population: country.population?.toLocaleString() || 'Unknown',
-                area: country.area?.toLocaleString() + " km" || 'Unknown',
-                languages: country.languages ? Object.values(country.languages).join(", ")
-                : 'Unknown',
-                cca3: cca3 || 'Unknown',
-                currencies: country.currencies
-                ? Object.values(country.currencies)
-                .map(c => c.name)
-                .join(", ") : "Unknown",
-                timezones: country.timezones ? Object.values(country.timezones).join(", ")
-                : "Unknown"
+        population: country.population?.toLocaleString() || 'Unknown',
+        area: country.area?.toLocaleString() + " km" || 'Unknown',
+        languages: country.languages ? Object.values(country.languages).join(", ")
+        : 'Unknown',
+        cca3: cca3 || 'Unknown',
+        currencies: country.currencies
+        ? Object.values(country.currencies)
+        .map(c => c.name)
+        .join(", ") : "Unknown",
+        timezones: country.timezones ? Object.values(country.timezones).join(", ")
+        : "Unknown"
             }
-            console.log(country.cca3 + " borders with " + infoAboutCountries[cca3].borders) 
+            //console.log(country.cca3 + " borders with " + infoAboutCountries[cca3].borders) 
             //console.log(infoAboutCountries[name])
         })
         
-    })  
+  });
