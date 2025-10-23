@@ -198,7 +198,14 @@ html, body {
   color: var(--muted);
   backdrop-filter: blur(4px);
 }
-
+.side-card-info{
+  font-size: 23px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
 /* visible state */
 .side-card.show {
   transform: translate(0, -50%); /* slide in from left */

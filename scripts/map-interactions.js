@@ -70,7 +70,7 @@
     function clickCountry(feature,layer){
         //const layer = e.target
         if(!isGuessing){
-            console.log(feature.properties.name)
+            //console.log(feature.properties.name)
             map.fitBounds(layer.getBounds(),{animate: true})
             openCountryCard(layer,feature)
         }else{
@@ -106,6 +106,7 @@
      * @returns {string} capitalized string
      */
     function capitalize(s){
+        if(!s) return
         const remain = s.slice(1)
         const first = s.charAt(0)
         const firstCap = first.toUpperCase()
@@ -144,6 +145,10 @@
      * @param {Object} feature - GeoJSON feature with properties used for display
      */
     function openCountryCard(layer,feature){
+        closeCard()
+        const info = infoAboutCountries[feature.properties.iso_a3]
+        if(!info) return
+        //console.log(closeSideBtn.type)
         //Add correct data here
         if(openedLayer){
             resetCountryBylayer(openedLayer)
@@ -156,9 +161,13 @@
         layer._permanent = true;
         sidecard.classList.add("show")
         openedLayer = layer
-        document.getElementById("countryName").textContent = feature.properties.name
-        document.getElementById("capital").textContent = feature.properties.name
-        document.getElementById("population").textContent = feature.properties.name 
+        console.log(info)
+        cardCountryName.textContent = info['country']
+        cardCapitalName.textContent = info['capital']
+        cardPopulation.textContent = info['population']
+        cardArea.textContent = info['area']
+        cardCurrencyName.textContent = info['currencies'] 
+        cardTimezone.textContent = info['timezones']
     }
     /**
      * generateRandomQuestion
@@ -215,33 +224,72 @@
         isGuessing = false
         card.classList.remove("show");
         showBtn.style.display = "block";
-        guessedCountries.forEach((layer) => {
+        if(guessedCountries){
+            guessedCountries.forEach((layer) => {
             resetCountryBylayer(layer)
         })
+        }
         guessedCountries = []
     }
-    // Card listeners
-    showBtn.addEventListener("click", () => {
-        isGuessing = true  
-        card.classList.add("show");
-        showBtn.style.display = "none";
-        question = generateRandomQuestion()
-        document.getElementById("card-text").textContent = question[0]
-        currentAnswer = question[1]
-    });
+    function closeSideCard(){
+        try {
+                console.log('closeSideBtn pressed');
+                if (sidecard) sidecard.classList.remove('show');
+                if (openedLayer) {
+                    try { resetCountryBylayer(openedLayer); } catch (e) { console.warn('resetCountryBylayer error', e); }
+                }
+                if (showSideBtn) showSideBtn.style.display = 'block';
+                openedLayer = null;
+            } catch (err) { console.error('closeSideBtn handler error', err); }
+    }
+    
+    if (typeof showBtn === 'undefined' || !showBtn) showBtn = document.getElementById('showButton') || document.getElementById('showBtn');
+    if (typeof closeBtn === 'undefined' || !closeBtn) closeBtn = document.getElementById('closeCard') || document.getElementById('closeBtn');
+    if (typeof showSideBtn === 'undefined' || !showSideBtn) showSideBtn = document.getElementById('showSideButton') || document.getElementById('showSideBtn') || document.querySelector('.show-side-btn');
+    if (typeof closeSideBtn === 'undefined' || !closeSideBtn) closeSideBtn = document.getElementById('closeSideCard');
 
-    closeBtn.addEventListener("click", () => { 
-        closeCard()
-    });
+    if (showBtn) showBtn.type = 'button';
+    if (closeBtn) closeBtn.type = 'button';
+    if (showSideBtn) showSideBtn.type = 'button';
+    if (closeSideBtn) closeSideBtn.type = 'button';
 
-    showSideBtn.addEventListener("click", () => {
-        //sidecard.classList.add("show")
-        showSideButton.style.display("none")
-    })
-    closeSideBtn.addEventListener("click" , () => {
-        sidecard.classList.remove("show");
-        resetCountryBylayer(openedLayer)
-        showSideBtn.style.display("block")
-        openedLayer = null
-       
-    })
+    if (showBtn) {
+        showBtn.addEventListener('click', () => {
+            try {
+                closeSideCard()
+                isGuessing = true;
+                if (card) card.classList.add('show');
+                showBtn.style.display = 'none';
+                const question = generateRandomQuestion();
+                document.getElementById('card-text').textContent = question[0] || '';
+                currentAnswer = question[1] || null;
+            } catch (err) {
+                console.error('showBtn handler error', err);
+            }
+        });
+    } else {
+        console.warn('show button not found');
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            try { closeCard(); } catch (err) { console.error('closeBtn handler error', err); }
+        });
+    }
+
+    if (showSideBtn) {
+        showSideBtn.addEventListener('click', () => {
+            try {
+                if (sidecard) sidecard.classList.add('show');
+                showSideBtn.style.display = 'none';
+            } catch (err) { console.error('showSideBtn handler error', err); }
+        });
+    }
+
+    if (closeSideBtn) {
+        closeSideBtn.addEventListener('click', () => {
+            closeSideCard()
+        });
+    } else {
+        console.warn('close side button not found');
+    }

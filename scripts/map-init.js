@@ -18,12 +18,20 @@
  */
 // Create map
     const map = L.map('map').setView([20, 0], 2);
-    const card = document.getElementById("infoCard");
-    const sidecard = document.getElementById("countryCard");
-    const showSideBtn = document.getElementById("showSideButton");
-    const showBtn = document.getElementById("showButton");
-    const closeBtn = document.getElementById("closeCard");
-    const closeSideBtn = document.getElementById("closeSideCard");
+    //Card vars
+    var card = document.getElementById("infoCard");
+    var sidecard = document.getElementById("countryCard");
+    var showSideBtn = document.getElementById("showSideButton");
+    var showBtn = document.getElementById("showButton");
+    var closeBtn = document.getElementById("closeCard");
+    var closeSideBtn = document.getElementById("closeSideCard");
+    //Card info vars
+    var cardCountryName = document.getElementById("countryName")
+    var cardCapitalName = document.getElementById("capital")
+    var cardPopulation = document.getElementById("population")
+    var cardArea = document.getElementById("area")
+    var cardCurrencyName = document.getElementById("currency")
+    var cardTimezone = document.getElementById("timezone")
     let guessedCountries= []
     const questionTemplates = [
         "Which country has {capital} as its capital and is located in {region}?",
