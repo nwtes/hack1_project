@@ -41,6 +41,7 @@
     let isGuessing = false
     let listOfCountries = {}
     let namesOfCountries = []
+    let openedLayer = null
     let guesses = 0
     let infoAboutCountries = {}
     let input = document.getElementById('searchbar')

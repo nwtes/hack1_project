@@ -36,7 +36,13 @@
             if (isGuessing) {
                 // during guessing, avoid hover visual noise
                 return;
-            } else {
+            } else if(openedLayer) {
+                if(openedLayer == e.target){
+                    return
+                }else{
+                    highlightCountry(e)
+                }
+            }else{
                 highlightCountry(e);
             }
             };

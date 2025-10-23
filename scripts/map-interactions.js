@@ -56,6 +56,7 @@
      * @param {L.Layer} layer - Leaflet layer to reset
      */
     function resetCountryBylayer(layer){
+        if(layer._permanent == true) layer._permanent = false
         geojson.resetStyle(layer)
     }
     /**
@@ -71,7 +72,7 @@
         if(!isGuessing){
             console.log(feature.properties.name)
             map.fitBounds(layer.getBounds(),{animate: true})
-            openCountryCard(feature)
+            openCountryCard(layer,feature)
         }else{
             
             if(guesses <= 4){
@@ -142,9 +143,19 @@
      * selected GeoJSON feature.
      * @param {Object} feature - GeoJSON feature with properties used for display
      */
-    function openCountryCard(feature){
+    function openCountryCard(layer,feature){
         //Add correct data here
+        if(openedLayer){
+            resetCountryBylayer(openedLayer)
+        }
+        layer.setStyle({
+            color:'#16106bff',
+            weight: 1,
+            fillOpacity: 0.2
+        })
+        layer._permanent = true;
         sidecard.classList.add("show")
+        openedLayer = layer
         document.getElementById("countryName").textContent = feature.properties.name
         document.getElementById("capital").textContent = feature.properties.name
         document.getElementById("population").textContent = feature.properties.name 
@@ -178,7 +189,7 @@
             }
         }
 
-        // If we didn't get a pickedCca3, fall back to random from namesOfCountries
+        // Fallback
         let countryKey;
         if (pickedCca3) {
             countryKey = pickedCca3;
@@ -229,5 +240,8 @@
     })
     closeSideBtn.addEventListener("click" , () => {
         sidecard.classList.remove("show");
+        resetCountryBylayer(openedLayer)
         showSideBtn.style.display("block")
+        openedLayer = null
+       
     })
