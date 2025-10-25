@@ -63,11 +63,11 @@ function resetCountryBylayer(layer) {
      */
 function clickCountry(feature, layer) {
         //const layer = e.target
-        if(!isGuessing){
+        if(!isGuessing && !isGameStarted){
             //console.log(feature.properties.name)
             map.fitBounds(layer.getBounds(),{animate: true})
             openCountryCard(layer,feature)
-        }else{
+        }else if (isGuessing && !isGameStarted){
             
             if(guesses <= 4){
                 if (feature.properties.name == currentAnswer) {
@@ -86,6 +86,12 @@ function clickCountry(feature, layer) {
                 //handle not guessing in 5 times
                 alert('You failed to guess the correct country');
                 closeCard();
+            }
+        }else if(isGameStarted){
+            if(feature.properties.name === currentAnswer){
+                if(clickResolver) clickResolver(feature.properties.name)
+            }else{
+                if(clickResolver) clickResolver("FAIL")
             }
         }
     }
@@ -154,6 +160,7 @@ function openCountryCard(layer, feature) {
     cardCurrencyName.textContent = info['currencies'];
     cardTimezone.textContent = info['timezones'];
 }
+
     /**
      * generateRandomQuestion
      * Create a QA pair by selecting a country (prefer the manual topPool if
@@ -207,6 +214,9 @@ function generateRandomQuestion() {
 function closeCard() {
     currentAnswer = null;
     isGuessing = false;
+    if(isGameStarted){
+        endGame()
+    }
     card.classList.remove("show");
     showBtn.style.display = "block";
     if (guessedCountries) {
@@ -283,5 +293,6 @@ if (closeSideBtn) {
 if (showQuizBtn) {
     showQuizBtn.addEventListener('click', () => {
         // placeholder for quiz button handler
+        startGame();
     });
 }

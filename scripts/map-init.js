@@ -17,7 +17,9 @@
  * - guessedCountries, questionTemplates, currentAnswer, isGuessing, etc.: app state
  */
 // Create map
-    const map = L.map('map').setView([20, 0], 2);
+    const map = L.map('map',{
+        zoomControl: false
+    }).setView([20, 0], 2);
     //Card vars
     var card = document.getElementById("infoCard");
     var sidecard = document.getElementById("countryCard");
@@ -33,6 +35,8 @@
     var cardArea = document.getElementById("area");
     var cardCurrencyName = document.getElementById("currency");
     var cardTimezone = document.getElementById("timezone");
+    //Game vars
+    var scoreBar = document.getElementById("scoreDisplay")
     let guessedCountries= [];
     const questionTemplates = [
         "Which country has {capital} as its capital and is part of the {region} region?",
@@ -56,6 +60,9 @@
     "Which country has {capital} as its capital and uses {currencies} as official money?",
     "Which country located in {region} has an area of approximately {area}?"
     ];
+    let userScore = 0
+    let clickResolver = null;
+    let isGameStarted = false;
     let currentAnswer = null;
     let isGuessing = false;
     let listOfCountries = {};
@@ -72,5 +79,6 @@
         worldCopyJump: true,
         preferCanvas: true,
         minZoom: 3,
-        attribution: '&copy; OpenStreetMap contributors'
+        attribution: '&copy; OpenStreetMap contributors',
+        
     }).addTo(map);

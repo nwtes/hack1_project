@@ -10,6 +10,15 @@
   <div id="searchbar-conatiner">
     <input type="text" id="searchbar" placeholder="Search for a country">
   </div>
+  <!-- Score display (visual only). JS should update #scoreDisplay text. No background, bluish color. -->
+  <div id="scoreDisplay" class="score-display" role="status" aria-live="polite">Your score: 0</div>
+  <!-- Timer UI (visual only) - top-right. JS hooks: #timerDisplay, #timerStart, #timerPause, #timerReset -->
+  <div id="timer-container" class="timer" role="region" aria-label="Quiz timer">
+    <div class="timer-display" id="timerDisplay" aria-live="polite">60</div>
+    <div class="timer-controls">
+      <button class="timer-btn" id="quizButton" type="button">Start timed quiz!</button>
+    </div>
+  </div>
   <div id="map"></div>
   <div class="card side-card" id="countryCard">
        
@@ -33,7 +42,6 @@
       </p>
   </div>
   <button class="show-btn" id="showButton">Guess The Country</button>
-  <button class="quiz-btn" id="quizButton">Start timed quiz</button>
   <!-- Script related to bottom card -->
   <!-- Load Leaflet first so `L` is available to the map scripts -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>

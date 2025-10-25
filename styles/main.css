@@ -36,6 +36,95 @@ html, body {
   pointer-events: auto;
 }
 
+/* Timer - top-right visual only. JS will update #timerDisplay and toggle button states. */
+.timer {
+  position: fixed;
+  top: 12px;
+  right: 16px;
+  z-index: 9200;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,252,255,0.9));
+  border-radius: 999px;
+  padding: 6px 10px;
+  box-shadow: 0 6px 20px rgba(16,40,70,0.08);
+  border: 1px solid rgba(45,108,223,0.06);
+}
+
+.timer-display {
+  min-width: 72px;
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--accent);
+  text-align: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(45,108,223,0.08), rgba(45,108,223,0.03));
+}
+
+.timer-controls {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.timer-btn {
+  background: transparent;
+  border: none;
+  padding: 6px 8px;
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 17px;
+  font-weight: 600;
+}
+.timer-btn:hover{
+  background-color: #0b3a9a;
+  color: white;
+}
+.timer-btn:enabled {
+  cursor: pointer;
+  color: #0b3a9a;
+  background: rgba(45,108,223,0.06);
+}
+
+@media (max-width: 600px) {
+  .timer { right: 8px; left: auto; padding: 6px; gap:8px; }
+  .timer-display { min-width: 58px; font-size: 0.95rem; }
+  .timer-btn { padding: 4px 6px; font-size: 0.85rem; }
+}
+
+/* Score display - top-left floating number, no background */
+.score-display {
+  position: fixed;
+  top: 12px;
+  left: 16px;
+  z-index: 9300;
+  color: #1a4bb8; /* bluish */
+  font-weight: 800;
+  font-size: 50px;
+  line-height: 1;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  text-shadow: 0 2px 6px rgba(26,75,184,0.14);
+  pointer-events: none; /* purely decorative */
+  user-select: none;
+  /* start hidden off-screen above the viewport; JS toggles the .show class */
+  transform: translateY(-140%);
+  opacity: 0;
+  transition: transform 360ms cubic-bezier(.2,.9,.2,1), opacity 240ms ease;
+}
+
+.score-display.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+@media (max-width: 600px) {
+  .score-display { left: 10px; font-size: 16px; }
+}
+
 #searchbar {
   padding: 8px 14px;
   border-radius: 999px;
