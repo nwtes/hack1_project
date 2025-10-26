@@ -64,7 +64,7 @@ function resetCountryBylayer(layer) {
 function clickCountry(feature, layer) {
         //const layer = e.target
         if(!isGuessing && !isGameStarted){
-            //console.log(feature.properties.name)
+            console.log(feature.properties.name)
             map.fitBounds(layer.getBounds(),{animate: true})
             openCountryCard(layer,feature)
         }else if (isGuessing && !isGameStarted){
@@ -74,8 +74,11 @@ function clickCountry(feature, layer) {
                     guessedCountries.push(layer);
                     layer._permanent = true;
                     layer.setStyle({ color: 'green', weight: 1, fillOpacity: 0.2 });
+                    // Visual animations: mark country and pop score/timer
+                    try { if (window.uiAnim && typeof window.uiAnim.markCountryCorrect === 'function') window.uiAnim.markCountryCorrect(layer); } catch (e) {}
+                    try { if (window.uiAnim && typeof window.uiAnim.popScore === 'function') window.uiAnim.popScore(window.userScore); } catch (e) {}
+                    try { if (window.uiAnim && typeof window.uiAnim.popTimer === 'function') window.uiAnim.popTimer(); } catch (e) {}
                     closeCard();
-                    alert("You're correct");
                 } else {
                     guesses++;
                     guessedCountries.push(layer);
@@ -90,8 +93,10 @@ function clickCountry(feature, layer) {
         }else if(isGameStarted){
             if(feature.properties.name === currentAnswer){
                 if(clickResolver) clickResolver(feature.properties.name)
+                try { if (window.uiAnim && typeof window.uiAnim.markCountryCorrect === 'function') window.uiAnim.markCountryCorrect(layer); } catch (e) {}
             }else{
                 if(clickResolver) clickResolver("FAIL")
+                try { if (window.uiAnim && typeof window.uiAnim.glowBrief === 'function') window.uiAnim.glowBrief(layer); } catch (e) {}
             }
         }
     }
@@ -143,6 +148,7 @@ function fillTemplate(template, data) {
 function openCountryCard(layer, feature) {
     closeCard();
     const info = infoAboutCountries[feature.properties.iso_a3];
+    console.log(feature.properties.iso_a3)
     if (!info) return;
     //Add correct data here
     if (openedLayer) {

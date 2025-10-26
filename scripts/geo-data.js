@@ -89,18 +89,19 @@ fetch('assets/top65.json')
                 borders: Array.isArray(country.borders) && country.borders.length > 0
                 ? country.borders.join(", ")
                 : "noone",
-        population: country.population?.toLocaleString() || 'Unknown',
-        area: country.area?.toLocaleString() + " km" || 'Unknown',
-        languages: country.languages ? Object.values(country.languages).join(", ")
-        : 'Unknown',
-        cca3: cca3 || 'Unknown',
-        currencies: country.currencies
-        ? Object.values(country.currencies)
-        .map(c => c.name)
-        .join(", ") : "Unknown",
-        timezones: country.timezones ? Object.values(country.timezones).join(", ")
-        : "Unknown"
+                population: country.population?.toLocaleString() || 'Unknown',
+                area: country.area?.toLocaleString() + " km" || 'Unknown',
+                languages: country.languages ? Object.values(country.languages).join(", ")
+                : 'Unknown',
+                cca3: cca3 || 'Unknown',
+                currencies: country.currencies
+                ? Object.values(country.currencies)
+                .map(c => c.name)
+                .join(", ") : "Unknown",
+                timezones: country.timezones ? Object.values(country.timezones).join(", ")
+                : "Unknown"
             }
+            if(country.cca3 == "FRA") console.log(infoAboutCountries[cca3])
             //console.log(country.cca3 + " borders with " + infoAboutCountries[cca3].borders) 
             //console.log(infoAboutCountries[name])
         })
