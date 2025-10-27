@@ -14,7 +14,11 @@
   <div id="scoreDisplay" class="score-display" role="status" aria-live="polite">Your score: 0</div>
   <!-- Timer UI (visual only) - top-right. JS hooks: #timerDisplay, #timerStart, #timerPause, #timerReset -->
   <div id="timer-container" class="timer" role="region" aria-label="Quiz timer">
-    <div class="timer-display" id="timerDisplay" aria-live="polite">60</div>
+    <div class="timer-wrap">
+      <div class="timer-display" id="timerDisplay" aria-live="polite">60</div>
+      <!-- transient delta badge: JS should set text to "+4" or "-4" and toggle .show and .positive/.negative -->
+      <div class="timer-delta" id="timerDelta" aria-hidden="true">+4</div>
+    </div>
     <div class="timer-controls">
       <button class="timer-btn" id="quizButton" type="button">Start timed quiz!</button>
     </div>

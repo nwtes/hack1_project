@@ -10,18 +10,29 @@
  * modify any logic. It relies on globals declared in `map-init.js` and
  * `geo-data.js` and must be loaded after them.
  */
-input.addEventListener('keydown', (e) => {
-    if (e.key == 'Enter') {
-        const text = input.value;
-        const layer = listOfCountries[capitalize(text.toLowerCase())];
-        if (layer == null) {
-            console.log('Not found');
-        } else {
-            map.fitBounds(layer.getBounds(), { animate: true });
+try {
+    input.addEventListener('keydown', (e) => {
+        try {
+            if (e.key == 'Enter') {
+                const text = input.value;
+                const layer = listOfCountries[capitalize(text.toLowerCase())];
+                const feature = listOfFeatures[capitalize(text.toLowerCase())];
+                if (layer == null || feature == null) {
+                    console.log('Not found');
+                } else {
+                    console.log(feature);
+                    map.fitBounds(layer.getBounds(), { animate: true });
+                    openCountryCard(layer, feature);
+                }
+                input.value = '';
+            }
+        } catch (err) {
+            console.error('search input handler error', err);
         }
-        input.value = '';
-    }
-});
+    });
+} catch (err) {
+    console.warn('search input not available or failed to bind', err);
+}
    
     
     /**
@@ -31,9 +42,14 @@ input.addEventListener('keydown', (e) => {
      * @param {Object} e - Leaflet event with `target` layer
      */
 function highlightCountry(e) {
-    const layer = e.target;
-    layer.setStyle({ color: '#555', weight: 1, fillOpacity: 0.2 });
-    layer.bringToFront();
+    try {
+        const layer = e.target;
+        if (!layer) return;
+        if (typeof layer.setStyle === 'function') layer.setStyle({ color: '#555', weight: 1, fillOpacity: 0.2 });
+        if (typeof layer.bringToFront === 'function') layer.bringToFront();
+    } catch (err) {
+        console.error('highlightCountry error', err);
+    }
 }
     /**
      * resetCountry
@@ -41,8 +57,13 @@ function highlightCountry(e) {
      * @param {Object} e - Leaflet event with `target` layer
      */
 function resetCountry(e) {
-    const layer = e.target;
-    geojson.resetStyle(layer);
+    try {
+        const layer = e.target;
+        if (!layer) return;
+        if (geojson && typeof geojson.resetStyle === 'function') geojson.resetStyle(layer);
+    } catch (err) {
+        console.error('resetCountry error', err);
+    }
 }
     /**
      * resetCountryBylayer
@@ -50,8 +71,33 @@ function resetCountry(e) {
      * @param {L.Layer} layer - Leaflet layer to reset
      */
 function resetCountryBylayer(layer) {
-    if (layer._permanent == true) layer._permanent = false;
-    geojson.resetStyle(layer);
+    try {
+        if (!layer) return;
+        if (layer._permanent == true) layer._permanent = false;
+        if (geojson && typeof geojson.resetStyle === 'function') geojson.resetStyle(layer);
+    } catch (err) {
+        console.error('resetCountryBylayer error', err);
+    }
+}
+function extractCca3FromFeature(feature) {
+    const props = feature && feature.properties ? feature.properties : {};
+    const sentinels = new Set(['-99', -99, null, undefined, '']);
+    const candidates = ['iso_a3', 'iso_a3_eh', 'wb_a3', 'un_a3', 'cca3', 'cca_3', 'ISO_A3'];
+    for (const key of candidates) {
+        let res = props[key];
+        if (res === undefined) {
+            res = props[key.toLowerCase()] ?? props[key.toUpperCase()];
+        }
+        if (sentinels.has(res)) continue;
+        if (typeof res === 'number') continue;
+        if (typeof res === 'string') {
+            const str = res.trim();
+            if (!str) continue;
+            return str.toUpperCase();
+        }
+    }
+    
+    return null;
 }
     /**
      * clickCountry
@@ -62,43 +108,43 @@ function resetCountryBylayer(layer) {
      * @param {L.Layer} layer - Leaflet layer for the feature
      */
 function clickCountry(feature, layer) {
-        //const layer = e.target
-        if(!isGuessing && !isGameStarted){
-            console.log(feature.properties.name)
-            map.fitBounds(layer.getBounds(),{animate: true})
-            openCountryCard(layer,feature)
-        }else if (isGuessing && !isGameStarted){
-            
-            if(guesses <= 4){
-                if (feature.properties.name == currentAnswer) {
+    try {
+        if (!isGuessing && !isGameStarted) {
+            console.log(feature.properties.name);
+            if (layer && typeof layer.getBounds === 'function') map.fitBounds(layer.getBounds(), { animate: true });
+            openCountryCard(layer, feature);
+        } else if (isGuessing && !isGameStarted) {
+            if (guesses <= 4) {
+                if (feature && feature.properties && feature.properties.name == currentAnswer) {
                     guessedCountries.push(layer);
                     layer._permanent = true;
-                    layer.setStyle({ color: 'green', weight: 1, fillOpacity: 0.2 });
-                    // Visual animations: mark country and pop score/timer
-                    try { if (window.uiAnim && typeof window.uiAnim.markCountryCorrect === 'function') window.uiAnim.markCountryCorrect(layer); } catch (e) {}
-                    try { if (window.uiAnim && typeof window.uiAnim.popScore === 'function') window.uiAnim.popScore(window.userScore); } catch (e) {}
-                    try { if (window.uiAnim && typeof window.uiAnim.popTimer === 'function') window.uiAnim.popTimer(); } catch (e) {}
+                    if (typeof layer.setStyle === 'function') layer.setStyle({ color: 'green', weight: 1, fillOpacity: 0.2 });
+                    try { if (window.uiAnim && typeof window.uiAnim.markCountryCorrect === 'function') window.uiAnim.markCountryCorrect(layer); } catch (e) { console.warn('uiAnim.markCountryCorrect failed', e); }
+                    try { if (window.uiAnim && typeof window.uiAnim.popScore === 'function') window.uiAnim.popScore(window.userScore); } catch (e) { console.warn('uiAnim.popScore failed', e); }
+                    try { if (window.uiAnim && typeof window.uiAnim.popTimer === 'function') window.uiAnim.popTimer(); } catch (e) { console.warn('uiAnim.popTimer failed', e); }
                     closeCard();
                 } else {
                     guesses++;
                     guessedCountries.push(layer);
                     layer._permanent = true;
-                    layer.setStyle({ color: 'red', weight: 1, fillOpacity: 0.2 });
+                    if (typeof layer.setStyle === 'function') layer.setStyle({ color: 'red', weight: 1, fillOpacity: 0.2 });
                 }
-            }else{
-                //handle not guessing in 5 times
+            } else {
                 alert('You failed to guess the correct country');
                 closeCard();
             }
-        }else if(isGameStarted){
-            if(feature.properties.name === currentAnswer){
-                if(clickResolver) clickResolver(feature.properties.name)
-                try { if (window.uiAnim && typeof window.uiAnim.markCountryCorrect === 'function') window.uiAnim.markCountryCorrect(layer); } catch (e) {}
-            }else{
-                if(clickResolver) clickResolver("FAIL")
-                try { if (window.uiAnim && typeof window.uiAnim.glowBrief === 'function') window.uiAnim.glowBrief(layer); } catch (e) {}
+        } else if (isGameStarted) {
+            if (feature && feature.properties && feature.properties.name === currentAnswer) {
+                if (clickResolver) clickResolver(feature.properties.name);
+                try { if (window.uiAnim && typeof window.uiAnim.markCountryCorrect === 'function') window.uiAnim.markCountryCorrect(layer); } catch (e) { console.warn('uiAnim.markCountryCorrect failed', e); }
+            } else {
+                if (clickResolver) clickResolver('FAIL');
+                try { if (window.uiAnim && typeof window.uiAnim.glowBrief === 'function') window.uiAnim.glowBrief(layer); } catch (e) { console.warn('uiAnim.glowBrief failed', e); }
             }
         }
+    } catch (err) {
+        console.error('clickCountry error', err);
+    }
     }
     /**
      * capitalize
@@ -122,10 +168,6 @@ function capitalize(s) {
      * @returns {string} filled template
      */
 function fillTemplate(template, data) {
-        // Safe placeholder replacement:
-        // - If `data` is falsy, replace every placeholder with 'Unknown'.
-        // - Otherwise, replace each {key} with the string value of data[key]
-        //   or 'Unknown' if the property is missing.
     if (!data) {
         return template.replace(/{(\w+)}/g, () => "Unknown");
     }
@@ -146,25 +188,30 @@ function fillTemplate(template, data) {
      * @param {Object} feature - GeoJSON feature with properties used for display
      */
 function openCountryCard(layer, feature) {
-    closeCard();
-    const info = infoAboutCountries[feature.properties.iso_a3];
-    console.log(feature.properties.iso_a3)
-    if (!info) return;
-    //Add correct data here
-    if (openedLayer) {
-        resetCountryBylayer(openedLayer);
+    try {
+        closeCard();
+        const code = extractCca3FromFeature(feature)
+        const info = code ? infoAboutCountries[code] : 'Undefined'
+        console.log(feature && feature.properties && feature.properties.iso_a3);
+        if (!info) return;
+        //Add correct data here
+        if (openedLayer) {
+            resetCountryBylayer(openedLayer);
+        }
+        if (typeof layer.setStyle === 'function') layer.setStyle({ color: '#16106bff', weight: 1, fillOpacity: 0.2 });
+        layer._permanent = true;
+        if (sidecard && typeof sidecard.classList === 'object') sidecard.classList.add('show');
+        openedLayer = layer;
+        console.log(info);
+        if (cardCountryName) cardCountryName.textContent = info['country'];
+        if (cardCapitalName) cardCapitalName.textContent = info['capital'];
+        if (cardPopulation) cardPopulation.textContent = info['population'];
+        if (cardArea) cardArea.textContent = info['area'];
+        if (cardCurrencyName) cardCurrencyName.textContent = info['currencies'];
+        if (cardTimezone) cardTimezone.textContent = info['timezones'];
+    } catch (err) {
+        console.error('openCountryCard error', err);
     }
-    layer.setStyle({ color: '#16106bff', weight: 1, fillOpacity: 0.2 });
-    layer._permanent = true;
-    sidecard.classList.add("show");
-    openedLayer = layer;
-    console.log(info);
-    cardCountryName.textContent = info['country'];
-    cardCapitalName.textContent = info['capital'];
-    cardPopulation.textContent = info['population'];
-    cardArea.textContent = info['area'];
-    cardCurrencyName.textContent = info['currencies'];
-    cardTimezone.textContent = info['timezones'];
 }
 
     /**
@@ -175,9 +222,10 @@ function openCountryCard(layer, feature) {
      * @returns {[string, string]} [questionText, answerText]
      */
 function generateRandomQuestion() {
-    const i_question = Math.floor(Math.random() * questionTemplates.length);
-    const qaPair = [];
-    const template = questionTemplates[i_question];
+    try {
+        const i_question = Math.floor(Math.random() * questionTemplates.length);
+        const qaPair = [];
+        const template = questionTemplates[i_question];
 
     // Prefer the manual topPool whitelist when present
     let pickedCca3 = null;
@@ -205,12 +253,16 @@ function generateRandomQuestion() {
         countryKey = namesOfCountries[i_country];
     }
 
-    const country_info = infoAboutCountries[countryKey] || { country: countryKey };
-    const question = fillTemplate(template, country_info);
+        const country_info = (infoAboutCountries && infoAboutCountries[countryKey]) || { country: countryKey };
+        const question = fillTemplate(template, country_info);
 
-    qaPair[0] = question;
-    qaPair[1] = country_info.country;
-    return qaPair;
+        qaPair[0] = question;
+        qaPair[1] = country_info.country;
+        return qaPair;
+    } catch (err) {
+        console.error('generateRandomQuestion error', err);
+        return ['(question unavailable)', null];
+    }
 }
     /**
      * closeCard
@@ -218,19 +270,23 @@ function generateRandomQuestion() {
      * temporary highlights applied to guessed countries.
      */
 function closeCard() {
-    currentAnswer = null;
-    isGuessing = false;
-    if(isGameStarted){
-        endGame()
+    try {
+        currentAnswer = null;
+        isGuessing = false;
+        if (isGameStarted) {
+            endGame();
+        }
+        if (card && card.classList) card.classList.remove('show');
+        if (showBtn) showBtn.style.display = 'block';
+        if (guessedCountries) {
+            guessedCountries.forEach((layer) => {
+                resetCountryBylayer(layer);
+            });
+        }
+        guessedCountries = [];
+    } catch (err) {
+        console.error('closeCard error', err);
     }
-    card.classList.remove("show");
-    showBtn.style.display = "block";
-    if (guessedCountries) {
-        guessedCountries.forEach((layer) => {
-            resetCountryBylayer(layer);
-        });
-    }
-    guessedCountries = [];
 }
 
 function closeSideCard() {
@@ -244,7 +300,8 @@ function closeSideCard() {
         openedLayer = null;
     } catch (err) { console.error('closeSideBtn handler error', err); }
 }
-    
+
+
 if (typeof showBtn === 'undefined' || !showBtn) showBtn = document.getElementById('showButton') || document.getElementById('showBtn');
 if (typeof closeBtn === 'undefined' || !closeBtn) closeBtn = document.getElementById('closeCard') || document.getElementById('closeBtn');
 if (typeof showSideBtn === 'undefined' || !showSideBtn) showSideBtn = document.getElementById('showSideButton') || document.getElementById('showSideBtn') || document.querySelector('.show-side-btn');

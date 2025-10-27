@@ -16,28 +16,29 @@
  * - card, sidecard, showBtn, showSideBtn, closeBtn, closeSideBtn: DOM elements
  * - guessedCountries, questionTemplates, currentAnswer, isGuessing, etc.: app state
  */
-// Create map
-    const map = L.map('map',{
-        zoomControl: false
-    }).setView([20, 0], 2);
-    //Card vars
-    var card = document.getElementById("infoCard");
-    var sidecard = document.getElementById("countryCard");
-    var showSideBtn = document.getElementById("showSideButton");
-    var showBtn = document.getElementById("showButton");
-    var closeBtn = document.getElementById("closeCard");
-    var closeSideBtn = document.getElementById("closeSideCard");
-    var showQuizBtn = document.getElementById("quizButton");
-    //Card info vars
-    var cardCountryName = document.getElementById("countryName");
-    var cardCapitalName = document.getElementById("capital");
-    var cardPopulation = document.getElementById("population");
-    var cardArea = document.getElementById("area");
-    var cardCurrencyName = document.getElementById("currency");
-    var cardTimezone = document.getElementById("timezone");
-    //Game vars
-    var scoreBar = document.getElementById("scoreDisplay")
-    let guessedCountries= [];
+/** Create the Leaflet map instance */
+const map = L.map('map', { zoomControl: false }).setView([20, 0], 2);
+
+/** UI elements */
+var card = document.getElementById('infoCard');
+var sidecard = document.getElementById('countryCard');
+var showSideBtn = document.getElementById('showSideButton');
+var showBtn = document.getElementById('showButton');
+var closeBtn = document.getElementById('closeCard');
+var closeSideBtn = document.getElementById('closeSideCard');
+var showQuizBtn = document.getElementById('quizButton');
+
+/** Card info elements */
+var cardCountryName = document.getElementById('countryName');
+var cardCapitalName = document.getElementById('capital');
+var cardPopulation = document.getElementById('population');
+var cardArea = document.getElementById('area');
+var cardCurrencyName = document.getElementById('currency');
+var cardTimezone = document.getElementById('timezone');
+
+/** Game elements */
+var scoreBar = document.getElementById('scoreDisplay');
+let guessedCountries = [];
     const questionTemplates = [
         "Which country has {capital} as its capital and is part of the {region} region?",
         "The nation that speaks {languages} and uses {currencies} as its currency is known as what?",
@@ -60,19 +61,20 @@
         "Which country has {capital} as its capital and uses {currencies} as official money?",
         "Which country located in {region} has an area of approximately {area}?"
     ];
-    let userScore = 0
+    let userScore = 0;
     let clickResolver = null;
     let isGameStarted = false;
     let currentAnswer = null;
     let isGuessing = false;
     let listOfCountries = {};
     let namesOfCountries = [];
+    let listOfCca3 = {};
     let openedLayer = null;
     let guesses = 0;
     let infoAboutCountries = {};
+    let listOfFeatures = {};
     let input = document.getElementById('searchbar');
     let geojson;
-    // Add OpenStreetMap tiles
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
         maxZoom: 6,
         keepBuffer: 10,

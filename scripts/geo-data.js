@@ -15,47 +15,44 @@
    * event handlers (hover, click). Populates `namesOfCountries` and
    * `listOfCountries` used by the rest of the app.
    */
-  // Initiazlizing world borders and array of countries
-    fetch('assets/custom.geo.json')
-      .then(res => res.json())
-      .then(data => {
-        geojson = L.geoJSON(data, {
-          style: { weight:0, fillOpacity:0 },
-          onEachFeature: (feature, layer) => {
-            if(!feature.properties.iso_a3) feature.properties.iso_a3 = 'Unknown';
-            namesOfCountries.push(feature.properties.iso_a3);
-            listOfCountries[feature.properties.name] = layer;
-            layer._permanent = false;
-            const onMouseOut = (e) => {
-                const layer = e.target
-                if(layer._permanent) return
-                resetCountry(e)
-            };
+fetch('assets/custom.geo.json')
+  .then(res => res.json())
+  .then(data => {
+    /** Create geojson layer and register feature handlers */
+    geojson = L.geoJSON(data, {
+      style: { weight: 0, fillOpacity: 0 },
+      onEachFeature: (feature, layer) => {
+        if (!feature.properties.iso_a3) feature.properties.iso_a3 = 'Unknown';
+        namesOfCountries.push(feature.properties.iso_a3);
+        listOfCountries[feature.properties.name] = layer;
+        listOfFeatures[feature.properties.name] = feature;
+        layer._permanent = false;
 
-            const onMouseOn = (e) => {
-        if (isGuessing) {
-                // during guessing, avoid hover visual noise
-                return;
-            } else if(openedLayer) {
-                if(openedLayer == e.target){
-                    return
-                }else{
-                    highlightCountry(e)
-                }
-            }else{
-                highlightCountry(e);
+        const onMouseOut = (e) => {
+          const layer = e.target;
+          if (layer._permanent) return;
+          resetCountry(e);
+        };
+
+        const onMouseOn = (e) => {
+          if (isGuessing) {
+            return;
+          } else if (openedLayer) {
+            if (openedLayer == e.target) {
+              return;
+            } else {
+              highlightCountry(e);
             }
-            };
-            layer.on(
-            {
-                mouseover: onMouseOn,
-                mouseout: onMouseOut,
-                click: () => clickCountry(feature,layer)
-            }
-            );
+          } else {
+            highlightCountry(e);
+          }
+        };
+
+        layer.on({ mouseover: onMouseOn, mouseout: onMouseOut, click: () => clickCountry(feature, layer) });
       }
     }).addTo(map);
-      });
+  })
+  .catch(err => { console.error('Failed to load custom.geo.json', err); });
 /**
  * Load manual top pool (optional whitelist of guessable cca3 codes).
  * When present `window.topPool` will be an array of uppercase cca3 strings
@@ -79,16 +76,14 @@ fetch('assets/top65.json')
       return res.json();
   })
   .then(data=> {
-    console.log(data);
+    //console.log(data);
     data.forEach(country => {
             const cca3 = country.cca3;
             infoAboutCountries[cca3] = {
                 country: country.name.common || 'Unknown',
                 capital: country.capital?.[0] || 'Unknown',
                 region: country.region || 'Unknown',
-                borders: Array.isArray(country.borders) && country.borders.length > 0
-                ? country.borders.join(", ")
-                : "noone",
+                borders: resolveBordersArray(country.borders),
                 population: country.population?.toLocaleString() || 'Unknown',
                 area: country.area?.toLocaleString() + " km" || 'Unknown',
                 languages: country.languages ? Object.values(country.languages).join(", ")
@@ -101,9 +96,34 @@ fetch('assets/top65.json')
                 timezones: country.timezones ? Object.values(country.timezones).join(", ")
                 : "Unknown"
             }
-            if(country.cca3 == "FRA") console.log(infoAboutCountries[cca3])
-            //console.log(country.cca3 + " borders with " + infoAboutCountries[cca3].borders) 
-            //console.log(infoAboutCountries[name])
+      listOfCca3[cca3] = country.name.common    
+       if(country.cca3 == 'CHE') console.log(infoAboutCountries[cca3]) 
+      //console.log(resolveBordersArray(country.borders))      
+      if (country.cca3 == 'DEU') console.log(infoAboutCountries[cca3]); 
         })
+       
+        console.log(cca3Resolver("CHE"))
+       console.log(Object.keys(listOfCca3).length);
+       console.log(listOfCca3)  
         
   });
+  function resolveBordersArray(borders){
+    if(!Array.isArray(borders) || borders.length === 0) return 'noone';
+    return borders
+    .map(code => {
+      if(!code) return null;
+      const key = String(code).trim().toUpperCase()
+      //console.log(key)
+      const name = cca3Resolver(key)
+      return name
+      
+    }).filter(Boolean).join(", ")
+  }
+  function cca3Resolver(cca3) {
+  if (!cca3) return undefined;
+  const key = String(cca3).trim().toUpperCase();
+  if (typeof listOfCca3 === 'object' && listOfCca3) {
+    return listOfCca3[key];
+  }
+  return undefined;
+}

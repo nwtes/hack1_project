@@ -63,6 +63,41 @@ html, body {
   background: linear-gradient(90deg, rgba(45,108,223,0.08), rgba(45,108,223,0.03));
 }
 
+/* Timer delta (+-4) that slides under the counter */
+.timer-wrap { position: relative; display: inline-block; }
+.timer-delta {
+  position: absolute;
+  left: 50%;
+  top: 100%; /* start below the counter */
+  transform: translateX(-50%) translateY(8px);
+  font-weight: 800;
+  font-size: 35px;
+  line-height: 1;
+  padding: 2px 6px;
+  color: #0b3a9a;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+  transition: none;
+}
+.timer-delta.positive { color: #16a34a; /* green */ text-shadow: 0 2px 6px rgba(22,163,74,0.12); }
+.timer-delta.negative { color: #dc2626; /* red */ text-shadow: 0 2px 6px rgba(220,38,38,0.12); }
+
+@keyframes delta-slide {
+  0% { transform: translateX(-50%) translateY(16px); opacity: 0; }
+  20% { transform: translateX(-50%) translateY(4px); opacity: 1; }
+  60% { transform: translateX(-50%) translateY(0px); opacity: 1; }
+  100% { transform: translateX(-50%) translateY(14px); opacity: 0; }
+}
+
+.timer-delta.show {
+  animation: delta-slide 820ms cubic-bezier(.2,.9,.2,1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timer-delta.show { animation: none !important; opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
 .timer-controls {
   display: flex;
   gap: 6px;
