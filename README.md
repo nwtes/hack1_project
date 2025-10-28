@@ -75,8 +75,7 @@ Troubleshooting (concise, user-facing)
 How to contribute
 - Fork the repository, create a feature branch, and open a PR. Keep changes focused and include screenshots for UI changes.
 
-License
-- This repository is released under the MIT License (adjust as needed). Third-party libraries (Leaflet, REST Countries) retain their own terms; attribute them in derivative works.
+
 
 ----
 
