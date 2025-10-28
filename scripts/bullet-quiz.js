@@ -17,7 +17,8 @@
  */
 let globalTimeleft = 60;
 let timerIntervalId = null;
-
+const correctSound = new Audio('./sounds/correct.mp3')
+const wrongSound = new Audio('./sounds/wrong.mp3')
 
 /**
  * Start a ticking timer that updates the UI each second.
@@ -101,6 +102,8 @@ async function startGame() {
     if (result === currentAnswer) {
       console.log('Correct!');
       timerEffect(true);
+      correctSound.currentTime = 0;
+      correctSound.play();
       globalTimeleft += 4;
       userScore = (typeof userScore === 'number' ? userScore : 0) + 300;
     } else if (result == 'TIMEOUT') {
@@ -110,6 +113,8 @@ async function startGame() {
     } else {
       globalTimeleft = Math.max(0, globalTimeleft - 4);
       timerEffect(false);
+      wrongSound.currentTime = 0;
+      wrongSound.play();
       if (globalTimeleft == 0) endGame();
     }
   }
