@@ -33,7 +33,32 @@ try {
 } catch (err) {
     console.warn('search input not available or failed to bind', err);
 }
-   
+(function () {
+      try {
+        const btn = document.getElementById('themeToggle');
+        if (!btn) return;
+        const body = document.body;
+        // initialize from localStorage
+        const saved = localStorage.getItem('zxctest.theme');
+        if (saved === 'dark') body.classList.add('dark-mode');
+        function updateButton() {
+          const isDark = body.classList.contains('dark-mode');
+          btn.textContent = isDark ? '☀️' : '🌙';
+          btn.setAttribute('aria-pressed', String(isDark));
+          btn.title = isDark ? 'Switch to light mode' : 'Switch to dark mode';
+        }
+        btn.addEventListener('click', function () {
+          const nowDark = body.classList.toggle('dark-mode');
+          map.removeLayer(nowDark ? lightLayer : darkLayer);
+          map.addLayer(nowDark ? darkLayer : lightLayer);
+          try { localStorage.setItem('zxctest.theme', nowDark ? 'dark' : 'light'); } catch (e) {}
+          updateButton();
+        });
+        updateButton();
+      } catch (err) {
+        console.warn('theme toggler init failed', err);
+      }
+    }());   
     
     /**
      * highlightCountry
@@ -139,7 +164,7 @@ function clickCountry(feature, layer) {
                 try { if (window.uiAnim && typeof window.uiAnim.markCountryCorrect === 'function') window.uiAnim.markCountryCorrect(layer); } catch (e) { console.warn('uiAnim.markCountryCorrect failed', e); }
             } else {
                 if (clickResolver) clickResolver('FAIL');
-                try { if (window.uiAnim && typeof window.uiAnim.glowBrief === 'function') window.uiAnim.glowBrief(layer); } catch (e) { console.warn('uiAnim.glowBrief failed', e); }
+                try { if (window.uiAnim && typeof window.uiAnim.markCountryWrong === 'function') window.uiAnim.markCountryWrong(layer); } catch (e) { console.warn('uiAnim.glowBrief failed', e); }
             }
         }
     } catch (err) {

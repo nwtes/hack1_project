@@ -61,6 +61,24 @@ let guessedCountries = [];
         "Which country has {capital} as its capital and uses {currencies} as official money?",
         "Which country located in {region} has an area of approximately {area}?"
     ];
+    let lightLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+        maxZoom: 6,
+        keepBuffer: 10,
+        worldCopyJump: true,
+        preferCanvas: true,
+        minZoom: 3,
+        attribution: '&copy; OpenStreetMap contributors',
+        
+    });
+    let darkLayer = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
+        maxZoom: 6,
+        keepBuffer: 10,
+        worldCopyJump: true,
+        preferCanvas: true,
+        minZoom: 3,
+        attribution: '&copy; OpenStreetMap contributors',
+        
+    });
     let userScore = 0;
     let clickResolver = null;
     let isGameStarted = false;
@@ -75,12 +93,4 @@ let guessedCountries = [];
     let listOfFeatures = {};
     let input = document.getElementById('searchbar');
     let geojson;
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-        maxZoom: 6,
-        keepBuffer: 10,
-        worldCopyJump: true,
-        preferCanvas: true,
-        minZoom: 3,
-        attribution: '&copy; OpenStreetMap contributors',
-        
-    }).addTo(map);
+    map.addLayer(lightLayer)
