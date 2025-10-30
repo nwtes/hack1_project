@@ -62,13 +62,11 @@ fetch('assets/custom.geo.json')
 fetch('assets/top65.json')
   .then(r => r.json())
   .then(arr => {
-    // store as a Set for faster lookup
+    // store as an uppercase array for predictable matching
     window.topPool = Array.isArray(arr) ? arr.map(s => String(s).toUpperCase()) : [];
-    console.log('Loaded topPool with', window.topPool.length, 'entries');
   })
   .catch(() => {
     window.topPool = [];
-    console.log('No topPool found or failed to load');
   });
     // Initializing info about countries
   fetch('https://restcountries.com/v3.1/all?fields=name,capital,region,borders,population,area,languages,currencies,cca3,timezones').then(res => {
@@ -76,7 +74,6 @@ fetch('assets/top65.json')
       return res.json();
   })
   .then(data=> {
-    //console.log(data);
     data.forEach(country => {
             const cca3 = country.cca3;
             infoAboutCountries[cca3] = {
@@ -96,15 +93,9 @@ fetch('assets/top65.json')
                 timezones: country.timezones ? Object.values(country.timezones).join(", ")
                 : "Unknown"
             }
-      listOfCca3[cca3] = country.name.common    
-       if(country.cca3 == 'CHE') console.log(infoAboutCountries[cca3]) 
-      //console.log(resolveBordersArray(country.borders))      
-      if (country.cca3 == 'DEU') console.log(infoAboutCountries[cca3]); 
+      listOfCca3[cca3] = country.name.common;
         })
        
-        console.log(cca3Resolver("CHE"))
-       console.log(Object.keys(listOfCca3).length);
-       console.log(listOfCca3)  
         
   });
   function resolveBordersArray(borders){

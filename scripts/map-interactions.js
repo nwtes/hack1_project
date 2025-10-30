@@ -6,9 +6,8 @@
  * - Wire input handlers, helpers, highlight/reset, click behavior
  * - Question generation and card UI listeners
  *
- * NOTE: This file is an exact-origin extract and intentionally does not
- * modify any logic. It relies on globals declared in `map-init.js` and
- * `geo-data.js` and must be loaded after them.
+ * NOTE: This file is an extract and relies on globals declared in
+ * `map-init.js` and `geo-data.js`. It must be loaded after them.
  */
 try {
     input.addEventListener('keydown', (e) => {
@@ -18,9 +17,8 @@ try {
                 const layer = listOfCountries[capitalize(text.toLowerCase())];
                 const feature = listOfFeatures[capitalize(text.toLowerCase())];
                 if (layer == null || feature == null) {
-                    console.log('Not found');
+                    // not found
                 } else {
-                    console.log(feature);
                     map.fitBounds(layer.getBounds(), { animate: true });
                     openCountryCard(layer, feature);
                 }
@@ -38,7 +36,7 @@ try {
         const btn = document.getElementById('themeToggle');
         if (!btn) return;
         const body = document.body;
-        // initialize from localStorage
+    // initialize from localStorage
         const saved = localStorage.getItem('zxctest.theme');
         if (saved === 'dark') body.classList.add('dark-mode');
         function updateButton() {
@@ -47,10 +45,11 @@ try {
           btn.setAttribute('aria-pressed', String(isDark));
           btn.title = isDark ? 'Switch to light mode' : 'Switch to dark mode';
         }
-        btn.addEventListener('click', function () {
+                btn.addEventListener('click', function () {
           const nowDark = body.classList.toggle('dark-mode');
-          map.removeLayer(nowDark ? lightLayer : darkLayer);
-          map.addLayer(nowDark ? darkLayer : lightLayer);
+                    // swap base layers (light/dark) if they exist
+                    try { map.removeLayer(nowDark ? lightLayer : darkLayer); } catch(e) {}
+                    try { map.addLayer(nowDark ? darkLayer : lightLayer); } catch(e) {}
           try { localStorage.setItem('zxctest.theme', nowDark ? 'dark' : 'light'); } catch (e) {}
           updateButton();
         });
@@ -68,13 +67,15 @@ try {
      */
 function highlightCountry(e) {
     try {
+        const isDark = body.classList.contains('dark-mode');
         const layer = e.target;
         if (!layer) return;
-        if (typeof layer.setStyle === 'function') layer.setStyle({ color: '#555', weight: 1, fillOpacity: 0.2 });
+        if (typeof layer.setStyle === 'function') layer.setStyle(isDark ? { color: '#a5a3a3ff', weight: 1, fillOpacity: 0.5 } : { color: '#555', weight: 1, fillOpacity: 0.2 });
         if (typeof layer.bringToFront === 'function') layer.bringToFront();
     } catch (err) {
         console.error('highlightCountry error', err);
     }
+    
 }
     /**
      * resetCountry
@@ -97,7 +98,7 @@ function resetCountry(e) {
      */
 function resetCountryBylayer(layer) {
     try {
-        if (!layer) return;
+    if (!layer) return;
         if (layer._permanent == true) layer._permanent = false;
         if (geojson && typeof geojson.resetStyle === 'function') geojson.resetStyle(layer);
     } catch (err) {
@@ -135,7 +136,6 @@ function extractCca3FromFeature(feature) {
 function clickCountry(feature, layer) {
     try {
         if (!isGuessing && !isGameStarted) {
-            console.log(feature.properties.name);
             if (layer && typeof layer.getBounds === 'function') map.fitBounds(layer.getBounds(), { animate: true });
             openCountryCard(layer, feature);
         } else if (isGuessing && !isGameStarted) {
@@ -214,20 +214,19 @@ function fillTemplate(template, data) {
      */
 function openCountryCard(layer, feature) {
     try {
+        let isDark = body.classList.contains('dark-mode');
         closeCard();
         const code = extractCca3FromFeature(feature)
         const info = code ? infoAboutCountries[code] : 'Undefined'
-        console.log(feature && feature.properties && feature.properties.iso_a3);
         if (!info) return;
-        //Add correct data here
+        // populate side card with country info
         if (openedLayer) {
             resetCountryBylayer(openedLayer);
         }
-        if (typeof layer.setStyle === 'function') layer.setStyle({ color: '#16106bff', weight: 1, fillOpacity: 0.2 });
+        if (typeof layer.setStyle === 'function') layer.setStyle(isDark ? { color: '#10a3ddff', weight: 1, fillOpacity: 0.2 } : { color: '#16106bff', weight: 1, fillOpacity: 0.2 });
         layer._permanent = true;
         if (sidecard && typeof sidecard.classList === 'object') sidecard.classList.add('show');
         openedLayer = layer;
-        console.log(info);
         if (cardCountryName) cardCountryName.textContent = info['country'];
         if (cardCapitalName) cardCapitalName.textContent = info['capital'];
         if (cardPopulation) cardPopulation.textContent = info['population'];
@@ -316,7 +315,6 @@ function closeCard() {
 
 function closeSideCard() {
     try {
-        console.log('closeSideBtn pressed');
         if (sidecard) sidecard.classList.remove('show');
         if (openedLayer) {
             try { resetCountryBylayer(openedLayer); } catch (e) { console.warn('resetCountryBylayer error', e); }

@@ -87,11 +87,10 @@ function sleep(ms) {
 async function startGame() {
   if (isGameStarted) return;
   isGameStarted = true;
-  const timerPromise = gameTimer((t) => console.log(t));
+  const timerPromise = gameTimer();
   if (card) card.classList.add('show');
   const score = document.getElementById('scoreDisplay');
   if (score) score.classList.add('show');
-  console.log('Game started');
   while (globalTimeleft > 0 && isGameStarted) {
     const qA = generateRandomQuestion();
     const question = qA[0];
@@ -100,7 +99,6 @@ async function startGame() {
     if (cardText) cardText.textContent = question;
     const result = await Promise.race([waitForAnswer(), timerPromise]);
     if (result === currentAnswer) {
-      console.log('Correct!');
       timerEffect(true);
       correctSound.currentTime = 0;
       correctSound.play();
@@ -108,7 +106,6 @@ async function startGame() {
       userScore = (typeof userScore === 'number' ? userScore : 0) + 300;
     } else if (result == 'TIMEOUT') {
       endGame();
-      console.log('time ended');
       break;
     } else {
       globalTimeleft = Math.max(0, globalTimeleft - 4);
@@ -130,7 +127,6 @@ function endGame() {
   const score = document.getElementById('scoreDisplay');
   if (score) score.classList.remove('show');
   if (card) card.classList.remove('show');
-  console.log('Game ended — stop gameplay here.');
   isGameStarted = false;
   userScore = 0;
   globalTimeleft = 60;

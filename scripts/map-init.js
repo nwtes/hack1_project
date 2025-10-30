@@ -7,9 +7,13 @@
  * - Initialize global UI DOM references used by the map and quiz
  * - Add base tile layer
  *
- * NOTE: This file is an exact-origin extract and intentionally does not
- * modify any logic. It uses globals (e.g. `map`) the rest of the split files
- * expect to exist. Keep this file loaded before the other map scripts.
+ * NOTE: This file initializes the Leaflet map and global DOM references
+ * used by the other modules. Keep this file loaded before the other map scripts.
+ *
+ * New/important behaviours:
+ * - Declares both `lightLayer` and `darkLayer` base tile layers; other code
+ *   may toggle these when the theme toggler is used.
+ * - The UI relies on `body.classList` having `dark-mode` when dark theme is active.
  */
 /** Globals declared by this file
  * - map: Leaflet map instance
@@ -18,7 +22,7 @@
  */
 /** Create the Leaflet map instance */
 const map = L.map('map', { zoomControl: false }).setView([20, 0], 2);
-
+var body = document.body
 /** UI elements */
 var card = document.getElementById('infoCard');
 var sidecard = document.getElementById('countryCard');
@@ -87,6 +91,7 @@ let guessedCountries = [];
     let listOfCountries = {};
     let namesOfCountries = [];
     let listOfCca3 = {};
+    
     let openedLayer = null;
     let guesses = 0;
     let infoAboutCountries = {};

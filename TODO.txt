@@ -4,3 +4,5 @@
 3.sanitize input and output of question generation system
 4.add info about countrues in separate card, generate quesion if feasible 
 5.Ask ai for expansion tips
+
+!CONTRIB

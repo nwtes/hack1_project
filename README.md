@@ -1,81 +1,136 @@
-# Learn-the-World — Interactive World Quiz
+# Learn-the-World — Interactive Map Quiz
 
-Learn-the-World is a single-page interactive geography application that helps people learn world countries, capitals and borders through exploration and a timed quiz mode. The app uses a fast Leaflet map, local GeoJSON for map geometry, and public country metadata to present concise country cards and a brisk timed "bullet quiz" experience.
+A compact single-page web app that turns a Leaflet world map into a clickable geography quiz. The app is intended for quick learning sessions, classroom demos, or embedding into a static site. It focuses on low friction: a simple question card, immediate map feedback (green/red borders), and a timed "bullet-quiz" mode.
 
-Why this matters — user value
-- Learn geography quickly with visual association: click a country on the map to reveal capital, population, area, timezones and currencies.
-- Practice recall under pressure with a timed quiz: short rounds and immediate score/timer feedback help build fast memory retrieval.
-- Ready for demos and teaching: deterministic demo pool and accessible UI (aria-live, reduced-motion support) make it suitable for classroom or presentation use.
+---
 
-Core features
-- Interactive Leaflet world map (local GeoJSON) with hover highlight and click-to-open country card.
-- Side card with country details: capital, population, area, currencies, languages and timezones.
-- Timed "bullet quiz" mode with score tracking, time deltas (+4 / -4), and visual feedback.
-- Search by name or code and quick zoom-to-country functionality.
-- Deterministic demo pool (`assets/top65.json`) for reproducible presentations.
+## Live demo / screenshots
 
-Screenshots
+Below are placeholders for screenshots — replace these files with actual screenshots from your local run and include the images in the repository (for example `screenshots/01-landing.png`). Each screenshot has a short description and the user benefit.
 
-Below are placeholder screenshots. Replace the files in `assets/` with real images (suggested names listed) to make this README visual for presentations.
+- `screenshots/01-landing.png` — Landing view with global map and search bar. Value: shows the map-first UI with quick search and visual focus on geography.
+- `screenshots/02-question-card.png` — Question card open with the quiz prompt. Value: demonstrates how the app presents a question and lets the user click countries to answer.
+- `screenshots/03-correct-feedback.png` — Country border turned green after a correct guess. Value: visual confirmation of success for fast learning reinforcement.
+- `screenshots/04-timer-mode.png` — Timed (bullet) quiz in progress with timer/score UI. Value: shows the timed challenge mode for engagement and spaced repetition.
 
-- `assets/screenshot-map.png` — Map view with country hover and search bar
+Include small captions under each screenshot highlighting the user benefit (memory reinforcement, low-latency feedback, accessibility, etc.).
 
-	Description / user value: Shows the full interactive world map with hover highlighting and the search bar centered at the top. Useful for showing immediate exploration value — users can visually locate countries and see adjacency relationships.
+---
 
-- `assets/screenshot-card.png` — Side card opened for a selected country
+## Purpose & user value
 
-	Description / user value: Displays the country info side card (capital, population, area, currencies). Demonstrates the teachable moment: learning facts while seeing the country on the map.
+- Teach world geography with immediate visual feedback — users click map features instead of typing long names.
+- Low-friction UX for repeated practice: quick questions, a persistent score, and an optional timed mode for more challenge.
+- Lightweight and easily deployed as static files — works well in classrooms, workshops, or as a demo on GitHub Pages.
 
-- `assets/screenshot-quiz.png` — Bullet quiz running with timer and score
+## Key features
 
-	Description / user value: Shows the timed quiz state with the timer, timer-delta badge, and score UI. Conveys the quick-paced practice mode that drives repeated recall.
+- Clickable Leaflet world map with GeoJSON country layers.
+- Search bar for direct lookup and zoom-to-country.
+- Question generator (uses a curated `top65.json` pool and REST Countries fallback when available).
+- Immediate visual feedback: borders turn green (correct) or red (wrong).
+- Timed "bullet-quiz" mode with score and brief timer deltas.
+- Simple dark-mode toggle using CSS variables.
 
-Deployment / Run locally (Windows / PowerShell)
+## UX design & process (concise)
 
-1. Open a PowerShell terminal in the project root (where `index.html` lives).
+1. Goals:
+   - Fast feedback loop (click → result).  
+   - Minimal text entry; map-first interaction.  
+   - Accessible, with keyboard bindings for search and an unobtrusive UI.
 
-2. Start a lightweight static server. Example using Python 3 (works on most developer machines):
+2. Wireframes & mockups:
+   - Wireframe A: Full-screen map with floating controls (search, timer, score).  
+   - Wireframe B: Question card slides up from bottom; large central prompt and actionable buttons.  
+   - Mockup: Visual styling with calming blue accent, rounded cards, and high-contrast borders for correct/wrong states.
+
+3. Iterations & reasoning for changes:
+   - Split the original monolithic script into modular files (`map-init.js`, `geo-data.js`, `map-interactions.js`, `bullet-quiz.js`, `uiAnims.js`) to improve maintainability and isolate responsibilities.
+   - Replaced transient animations with deterministic border color toggles (green/red). Rationale: SVG/Leaflet animations were brittle across browsers and reduced accessibility; color toggles are robust and immediately visible.
+   - Added CSS variables and a theme toggle to support dark mode with minimal duplication.
+   - Defensive programming: wrapped risky DOM/animation calls with try/catch to prevent visual helper errors from breaking core logic.
+
+4. Wireframe / mockup artifacts
+   - Attach sketches or PNG exports of the original wireframes into `design/` or `screenshots/` as you refine them. Include brief notes about decisions (why the question card is bottom-docked, why the search sits centered, etc.).
+
+## How it works (technical summary)
+
+- `index.html` — loads Leaflet, app scripts and styles. Script order matters: Leaflet → geo-data → map-init → uiAnims → map-interactions → bullet-quiz.
+- `scripts/geo-data.js` — loads local GeoJSON (`assets/custom.geo.json`) and optionally enriches country metadata via REST Countries API. It builds lookup tables used by the quiz generator.
+- `scripts/map-init.js` — initializes the Leaflet map and global references.
+- `scripts/map-interactions.js` — contains click/hover handlers, card open/close logic, and question generation wiring.
+- `scripts/bullet-quiz.js` — timer/score logic for the timed mode.
+- `scripts/uiAnims.js` — lightweight helper exposing `markCountryCorrect` / `markCountryWrong` (now simplified to set border color only).
+
+## Data and attribution
+
+- Map rendering and interaction: [Leaflet](https://leafletjs.com/) (BSD-2-Clause).  
+  - Leaflet CSS/JS is loaded from unpkg in `index.html`.
+- Country metadata: REST Countries v3 (used as an optional enrichment source).  
+- Curated question pool: `assets/top65.json` (included in repo).  
+- Portions of code were adapted from small Leaflet examples and public patterns for GeoJSON layer handling — these are standard usage patterns and are attributed to Leaflet documentation and examples.
+
+If you included any third-party snippets beyond the libraries above, add explicit attribution here and preserve license text as required.
+
+## How to run (development)
+
+Requirements: a modern browser and a static file server. You can use the built-in Python server or a simple PowerShell command.
+
+From the project root (PowerShell):
 
 ```powershell
-python -m http.server 5500
-# open http://127.0.0.1:5500/ in your browser
+# option 1: Python 3 simple server
+python -m http.server 8000
+
+# option 2: use PowerShell (serves current directory)
+# (requires .NET / PowerShell features available in Windows)
+npx http-server -p 8000  # if you have npm and http-server installed
 ```
 
-3. Alternative: use VS Code Live Server or Node's `http-server` (`npm i -g http-server`) and run `http-server -p 5500`.
+Open http://localhost:8000 in your browser.
 
-Notes:
-- Run the server from the project root so relative asset fetches succeed.
-- The app fetches external metadata from the REST Countries API — offline usage will still render the map, but some enriched details may be missing.
+Notes: If REST Countries is blocked or unavailable, the app falls back to `assets/top65.json` for question generation.
 
-Architecture (high level)
-- `index.html` — page shell and script ordering (Leaflet must load first).
-- `styles/main.css` — UI layout, theme and animation keyframes.
-- `assets/custom.geo.json` — GeoJSON used to render country shapes.
-- `assets/top65.json` — curated, optional quiz pool for deterministic demos.
-- `scripts/`:
-	- `map-init.js` — initializes the Leaflet map and UI references.
-	- `geo-data.js` — loads GeoJSON, enriches country metadata using REST Countries, and builds lookup maps.
-	- `map-interactions.js` — search, highlight, click handlers, and the side-card UI.
-	- `bullet-quiz.js` — quick timed quiz loop, timer management and score handling.
+## How to run tests / verify behavior
 
-Data sources and attribution
-- Map rendering and interaction: Leaflet (https://leafletjs.com) — BSD-2-Clause license.
-- Country metadata: REST Countries API v3 (https://restcountries.com) — public data used under the provider's terms.
-- GeoJSON data: included locally in `assets/custom.geo.json` (verify source and license if replacing with external data).
+- Open the console and check for errors during load: ensure Leaflet is loaded before other scripts.  
+- Verify clicking a country turns its border green for correct / red for incorrect.  
+- Toggle dark mode with the bottom-left button and confirm colors swap.
 
-Accessibility and settings
-- The UI honors the user's `prefers-reduced-motion` media setting. Animations are subtle and can be toggled in a future settings panel.
-- Score and timer elements use `aria-live` regions to announce changes for screen readers.
+## File map (important files)
 
-Troubleshooting (concise, user-facing)
-- If countries show "Unknown" for certain fields: ensure the REST Countries fetch completed (check network console) — the map geometry is local but enrichment is fetched remotely.
-- If the quiz doesn't start: confirm `index.html` is served over HTTP (some browsers block fetches from `file://`). Use the local server commands above.
+- `index.html` — main single-page shell.  
+- `styles/main.css` — app styles and theme variables.  
+- `scripts/map-init.js` — map initialization.  
+- `scripts/geo-data.js` — GeoJSON loading and country metadata.  
+- `scripts/map-interactions.js` — user interaction handlers and quiz wiring.  
+- `scripts/bullet-quiz.js` — timed quiz logic.  
+- `scripts/uiAnims.js` — minimal visual helper for result coloring.  
+- `assets/top65.json` — curated question pool.  
+- `assets/custom.geo.json` — GeoJSON file containing country geometry.
 
+## Accessibility & UX considerations
 
-How to contribute
-- Fork the repository, create a feature branch, and open a PR. Keep changes focused and include screenshots for UI changes.
+- Reduced-motion preference respected: transient animations were removed and the app uses color/state changes as primary feedback.  
+- Buttons include `aria-pressed` and role attributes in the score/timer regions; more ARIA labeling can be added for full screen-reader support.
 
+## Contributing
 
+Feel free to open issues or PRs. Suggested small improvements:  
+- Add automated build / preflight checks (ESLint).  
+- Add unit tests for question generator and GeoJSON normalization helpers.  
+- Improve accessibility (keyboard-only quiz flow, screen reader labels).
 
-----
+## License
+
+This project combines original code with open-source libraries (Leaflet). Unless you add a separate license file, treat the repository as MIT by default for your own code and follow library licenses for third-party code.
+
+---
+
+If you'd like, I can also:
+- produce a printable one-page project summary for a slide or demo.  
+- export the wireframes into PNGs and add them to `design/`.
+- reflow `styles/main.css` into clearly labeled sections for easier maintenance.
+
+Replace these placeholders with real screenshots and any extra attributions you need, and I will update the README with the actual images and captions.
 

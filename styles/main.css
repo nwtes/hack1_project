@@ -9,7 +9,7 @@
   --accent: #2d6cdf;
   --accent-contrast: #1a4bb8;
   --accent-rgb: 45,108,223; /* used where rgba(...) is needed */
-
+  --search-text : gray;
   /* Text / semantic */
   --text-color: #153b51;
   --muted: #48627a;
@@ -26,11 +26,15 @@
 
   --score-color: #1a4bb8;
   --shadow-strong: 0 8px 20px rgba(29,78,169,0.12);
+  /* button gradients (light theme prefers a slightly darker blue) */
+  --btn-top: #234fae; /* slightly darker than --accent */
+  --btn-bottom: var(--accent-contrast);
 }
 
 /* Dark theme overrides: toggle by adding `data-theme="dark"` on <html> or <body> */
 body.dark-mode {
   --bg-map : black;
+  --search-text : white;
   --bg-gradient: linear-gradient(180deg,#071028 0%, #06131f 100%);
   --bg-color: #06131f;
   --ui-surface: linear-gradient(180deg, rgba(10,16,24,0.95), rgba(14,18,24,0.9));
@@ -48,6 +52,9 @@ body.dark-mode {
   --danger-rgba: 255,107,107;
   --score-color: #79b8ff;
   --shadow-strong: 0 8px 20px rgba(0,0,0,0.6);
+  /* dark theme: make buttons match the subtle timer button look */
+  --btn-top: rgba(var(--accent-rgb),0.06);
+  --btn-bottom: rgba(var(--accent-rgb),0.03);
 }
 
 html, body {
@@ -71,8 +78,11 @@ html, body {
   width: 100%;
   height: 100%;
 }
-
+#searchbar{
+  color: var(--search-text);
+}
 #searchbar-conatiner {
+  
   position: absolute;
   top: 12px;
   left: 50%;
@@ -119,14 +129,14 @@ html, body {
   font-size: 35px;
   line-height: 1;
   padding: 2px 6px;
-  color: #0b3a9a;
+  color: var(--accent-contrast);
   opacity: 0;
   pointer-events: none;
   user-select: none;
   transition: none;
 }
-.timer-delta.positive { color: #16a34a; /* green */ text-shadow: 0 2px 6px rgba(22,163,74,0.12); }
-.timer-delta.negative { color: #dc2626; /* red */ text-shadow: 0 2px 6px rgba(220,38,38,0.12); }
+.timer-delta.positive { color: var(--success); /* green */ text-shadow: 0 2px 6px rgba(var(--success-rgba),0.12); }
+.timer-delta.negative { color: var(--danger); /* red */ text-shadow: 0 2px 6px rgba(var(--danger-rgba),0.12); }
 
 @keyframes delta-slide {
   0% { transform: translateX(-50%) translateY(16px); opacity: 0; }
@@ -247,7 +257,7 @@ html, body {
 .card .handle{
   width: 56px;
   height: 6px;
-  background: rgba(45,108,223,0.12);
+  background: rgba(var(--accent-rgb),0.12);
   border-radius: 6px;
   margin: 4px auto 10px;
 }
@@ -267,7 +277,7 @@ html, body {
   line-height: 1.6;
   text-align: center;
   max-width: 92%;
-  color: #153b51;
+  color: var(--text-color);
 }
 
 .close-btn {
@@ -276,7 +286,7 @@ html, body {
   right: 10px;
   width: 36px;
   height: 36px;
-  border: 1px solid rgba(0,0,0,0.06);
+  border: 1px solid var(--card-border);
   background: var(--ui-surface-contrast);
   border-radius: 10px;
   font-size: 20px;
@@ -289,26 +299,48 @@ html, body {
 
 .close-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 8px 20px rgba(29,78,169,0.12);
+  box-shadow: var(--shadow-strong);
 }
 
 .card ::-webkit-scrollbar{ height:8px; width:8px; }
-.card ::-webkit-scrollbar-thumb{ background: rgba(45,108,223,0.16); border-radius:6px; }
+.card ::-webkit-scrollbar-thumb{ background: rgba(var(--accent-rgb),0.16); border-radius:6px; }
 .card ::-webkit-scrollbar-track{ background: transparent; }
 
 .show-btn {
   position: fixed;
-  right: 16px;
+  left: 50%;
+  transform: translateX(-50%);
   bottom: 18px;
   z-index: 5200;
+  /* use button gradient variables so we can tune per-theme */
   padding: 10px 14px;
   border-radius: 10px;
   border: none;
-  background: linear-gradient(180deg,var(--accent), var(--accent-contrast));
+  background: linear-gradient(180deg,var(--btn-top), var(--btn-bottom));
   color: #fff;
   cursor: pointer;
   font-weight: 600;
   box-shadow: var(--shadow-strong);
+}
+
+/* Ensure .show-btn keeps a solid visible background even when combined with .timer-btn
+   (some rules like .timer-btn:enabled can add a translucent background). Use a more
+   specific selector to override those styles reliably. */
+.show-btn.timer-btn {
+  background: linear-gradient(180deg,var(--accent), var(--accent-contrast)) !important;
+  color: #fff !important;
+  padding: 10px 14px !important;
+  border-radius: 10px !important;
+  box-shadow: var(--shadow-strong) !important;
+}
+
+/* In dark mode, make the guess button appear like the subtle timed-quiz control */
+body.dark-mode .show-btn.timer-btn {
+  background: rgba(var(--accent-rgb),0.06) !important;
+  color: var(--accent-contrast) !important;
+  padding: 6px 10px !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
 }
 .quiz-btn{
   left:16px;
@@ -334,11 +366,11 @@ html, body {
   min-width: 140px;
   border-radius: 10px;
   border: none;
-  background: linear-gradient(180deg,var(--accent), #1a4bb8);
+  background: linear-gradient(180deg,var(--accent), var(--accent-contrast));
   color: #fff;
   cursor: pointer;
   font-weight: 600;
-  box-shadow: 0 8px 20px rgba(29,78,169,0.12);
+  box-shadow: var(--shadow-strong);
   transition: transform .15s ease, box-shadow .15s ease, opacity .12s ease;
 }
 
@@ -353,7 +385,7 @@ html, body {
 }
 
 .show-side-btn:focus {
-  outline: 3px solid rgba(45,108,223,0.18);
+  outline: 3px solid rgba(var(--accent-rgb),0.18);
   outline-offset: 2px;
 }
 
@@ -401,16 +433,23 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: var(--text-color);
+  
   backdrop-filter: blur(4px);
 }
+.side-card-text{
+  color: #6398df;
+}
+.side-card-text-var{
+  color: var(--text-color);
+}
 .side-card-info{
-  font-size: 23px;
+  font-size: 28px;
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: center; /* center content vertically */
   align-items: center;
+  gap: 20px; /* consistent spacing between info rows */
 }
 /* visible state */
 .side-card.show {
@@ -421,7 +460,7 @@ html, body {
 .side-card .handle {
   width: 36px;
   height: 6px;
-  background: rgba(45,108,223,0.12);
+  background: rgba(var(--accent-rgb),0.12);
   border-radius: 6px;
   margin: 6px 0 12px;
 }
@@ -435,15 +474,27 @@ html, body {
   margin: 6px 0;
 }
 
+/* Country card title and info adjustments */
+#countryCard .side-card-header h1,
+#countryCard #countryName {
+  font-size: 2rem; /* slightly larger title */
+  line-height: 1.05;
+  margin: 6px 0 0 0;
+  text-align: center;
+  color: var(--text-color);
+}
+
 .side-card #card-text {
   font-size: 1.15rem;
   line-height: 1.5;
   text-align: center;
-  color: #153b51;
+  color: var(--text-color);
   overflow: auto;
   width: 100%;
   padding: 6px 4px;
 }
+
+.side-card-info span { text-align: center; display: block; }
 
 /* move close button to the inner top-right corner of the side card */
 .side-card .close-btn {
