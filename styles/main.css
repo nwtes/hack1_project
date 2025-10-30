@@ -60,8 +60,13 @@ body.dark-mode {
 html, body {
   height: 100%;
   margin: 0;
-  font-family: system-ui, "Segoe UI", Roboto, Arial, sans-serif;
+  font-family: "DM Sans", sans-serif;
 }
+
+button, input, select, textarea { font-family: inherit; }
+.leaflet-container, .leaflet-control, .leaflet-popup, .leaflet-popup-content { font-family: inherit; }
+svg, svg text { font-family: inherit; }
+.modal, .card, .side-card { font-family: inherit; }
 
 #map {
   background-color: var(--bg-map);

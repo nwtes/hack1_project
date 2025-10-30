@@ -139,15 +139,18 @@ function clickCountry(feature, layer) {
             if (layer && typeof layer.getBounds === 'function') map.fitBounds(layer.getBounds(), { animate: true });
             openCountryCard(layer, feature);
         } else if (isGuessing && !isGameStarted) {
-            if (guesses <= 4) {
-                if (feature && feature.properties && feature.properties.name == currentAnswer) {
+            // allow up to 4 wrong guesses (guesses counts wrong attempts)
+            if (guesses < 4) {
+                const pickedName = feature && feature.properties ? String(feature.properties.name).trim() : '';
+                const expected = currentAnswer ? String(currentAnswer).trim() : '';
+                if (pickedName && expected && pickedName === expected) {
                     guessedCountries.push(layer);
                     layer._permanent = true;
                     if (typeof layer.setStyle === 'function') layer.setStyle({ color: 'green', weight: 1, fillOpacity: 0.2 });
                     try { if (window.uiAnim && typeof window.uiAnim.markCountryCorrect === 'function') window.uiAnim.markCountryCorrect(layer); } catch (e) { console.warn('uiAnim.markCountryCorrect failed', e); }
-                    try { if (window.uiAnim && typeof window.uiAnim.popScore === 'function') window.uiAnim.popScore(window.userScore); } catch (e) { console.warn('uiAnim.popScore failed', e); }
-                    try { if (window.uiAnim && typeof window.uiAnim.popTimer === 'function') window.uiAnim.popTimer(); } catch (e) { console.warn('uiAnim.popTimer failed', e); }
-                    closeCard();
+                    showInfoModal('Correct', 'You are correct!', [
+                        { text: 'Continue', className: 'timer-btn', onClick: () => { try { closeCard(); } catch (e) {} } }
+                    ]);
                 } else {
                     guesses++;
                     guessedCountries.push(layer);
@@ -155,8 +158,9 @@ function clickCountry(feature, layer) {
                     if (typeof layer.setStyle === 'function') layer.setStyle({ color: 'red', weight: 1, fillOpacity: 0.2 });
                 }
             } else {
-                alert('You failed to guess the correct country');
-                closeCard();
+                showInfoModal('No more guesses', 'You failed to guess the correct country', [
+                    { text: 'Close', className: 'timer-btn', onClick: () => { try { closeCard(); } catch (e) {} } }
+                ]);
             }
         } else if (isGameStarted) {
             if (feature && feature.properties && feature.properties.name === currentAnswer) {
@@ -183,6 +187,50 @@ function capitalize(s) {
     const first = s.charAt(0);
     const firstCap = first.toUpperCase();
     return firstCap + remain;
+}
+
+/**
+ * showInfoModal
+ * Small helper to show a modal styled like the timed-quiz end modal.
+ * Buttons is an array of objects: { text, className, onClick }
+ */
+function showInfoModal(title, message, buttons = []) {
+    try {
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        const h = document.createElement('h2');
+        h.textContent = title;
+        const p = document.createElement('p');
+        p.textContent = message;
+        const actions = document.createElement('div');
+        actions.className = 'modal-actions';
+
+        buttons.forEach(b => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = b.className || 'timer-btn';
+            btn.textContent = b.text || 'OK';
+            btn.addEventListener('click', () => {
+                try { if (typeof b.onClick === 'function') b.onClick(); } catch (e) { console.warn(e); }
+                try { overlay.remove(); } catch (e) {}
+            });
+            actions.appendChild(btn);
+        });
+
+        modal.appendChild(h);
+        modal.appendChild(p);
+        modal.appendChild(actions);
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+        return overlay;
+    } catch (err) {
+        console.warn('showInfoModal failed', err);
+        return null;
+    }
 }
     /**
      * fillTemplate
