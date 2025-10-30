@@ -6,7 +6,7 @@ A compact single-page web app that turns a Leaflet world map into a clickable ge
 
 ## Live demo / screenshots
 
-- `screenshots/landing-dark` — Landing view with global map and search bar. Value: shows the map-first UI with quick search and visual focus on geography.
+- ![landing](screenshots/landing.png) — Landing view with global map and search bar. Value: shows the map-first UI with quick search and visual focus on geography.
 - `screenshots/02-question-card.png` — Question card open with the quiz prompt. Value: demonstrates how the app presents a question and lets the user click countries to answer.
 - `screenshots/04-timer-mode.png` — Timed (bullet) quiz in progress with timer/score UI. Value: shows the timed challenge mode for engagement and spaced repetition.
 
