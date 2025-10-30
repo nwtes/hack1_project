@@ -6,11 +6,8 @@ A compact single-page web app that turns a Leaflet world map into a clickable ge
 
 ## Live demo / screenshots
 
-Below are placeholders for screenshots — replace these files with actual screenshots from your local run and include the images in the repository (for example `screenshots/01-landing.png`). Each screenshot has a short description and the user benefit.
-
-- `screenshots/01-landing.png` — Landing view with global map and search bar. Value: shows the map-first UI with quick search and visual focus on geography.
+- `screenshots/landing-dark` — Landing view with global map and search bar. Value: shows the map-first UI with quick search and visual focus on geography.
 - `screenshots/02-question-card.png` — Question card open with the quiz prompt. Value: demonstrates how the app presents a question and lets the user click countries to answer.
-- `screenshots/03-correct-feedback.png` — Country border turned green after a correct guess. Value: visual confirmation of success for fast learning reinforcement.
 - `screenshots/04-timer-mode.png` — Timed (bullet) quiz in progress with timer/score UI. Value: shows the timed challenge mode for engagement and spaced repetition.
 
 Include small captions under each screenshot highlighting the user benefit (memory reinforcement, low-latency feedback, accessibility, etc.).
@@ -50,8 +47,7 @@ Include small captions under each screenshot highlighting the user benefit (memo
    - Added CSS variables and a theme toggle to support dark mode with minimal duplication.
    - Defensive programming: wrapped risky DOM/animation calls with try/catch to prevent visual helper errors from breaking core logic.
 
-4. Wireframe / mockup artifacts
-   - Attach sketches or PNG exports of the original wireframes into `design/` or `screenshots/` as you refine them. Include brief notes about decisions (why the question card is bottom-docked, why the search sits centered, etc.).
+
 
 ## How it works (technical summary)
 
@@ -60,7 +56,7 @@ Include small captions under each screenshot highlighting the user benefit (memo
 - `scripts/map-init.js` — initializes the Leaflet map and global references.
 - `scripts/map-interactions.js` — contains click/hover handlers, card open/close logic, and question generation wiring.
 - `scripts/bullet-quiz.js` — timer/score logic for the timed mode.
-- `scripts/uiAnims.js` — lightweight helper exposing `markCountryCorrect` / `markCountryWrong` (now simplified to set border color only).
+- `scripts/uiAnims.js` — lightweight helper exposing `markCountryCorrect` / `markCountryWrong`.
 
 ## Data and attribution
 
@@ -70,7 +66,15 @@ Include small captions under each screenshot highlighting the user benefit (memo
 - Curated question pool: `assets/top65.json` (included in repo).  
 - Portions of code were adapted from small Leaflet examples and public patterns for GeoJSON layer handling — these are standard usage patterns and are attributed to Leaflet documentation and examples.
 
-If you included any third-party snippets beyond the libraries above, add explicit attribution here and preserve license text as required.
+## 🗺️ Map Data & Attribution
+
+This project uses map tiles from the following sources:
+
+- **Carto Light Basemap**  
+  Tiles © [Carto](https://carto.com/) — Map data © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright)
+
+- **Stadia Alidade Smooth Dark Basemap**  
+  Tiles © [Stadia Maps](https://stadiamaps.com/) — Map data © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright)
 
 ## How to run (development)
 
@@ -114,23 +118,5 @@ Notes: If REST Countries is blocked or unavailable, the app falls back to `asset
 - Reduced-motion preference respected: transient animations were removed and the app uses color/state changes as primary feedback.  
 - Buttons include `aria-pressed` and role attributes in the score/timer regions; more ARIA labeling can be added for full screen-reader support.
 
-## Contributing
 
-Feel free to open issues or PRs. Suggested small improvements:  
-- Add automated build / preflight checks (ESLint).  
-- Add unit tests for question generator and GeoJSON normalization helpers.  
-- Improve accessibility (keyboard-only quiz flow, screen reader labels).
-
-## License
-
-This project combines original code with open-source libraries (Leaflet). Unless you add a separate license file, treat the repository as MIT by default for your own code and follow library licenses for third-party code.
-
----
-
-If you'd like, I can also:
-- produce a printable one-page project summary for a slide or demo.  
-- export the wireframes into PNGs and add them to `design/`.
-- reflow `styles/main.css` into clearly labeled sections for easier maintenance.
-
-Replace these placeholders with real screenshots and any extra attributions you need, and I will update the README with the actual images and captions.
 

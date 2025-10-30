@@ -89,6 +89,7 @@ async function startGame() {
   isGameStarted = true;
   const timerPromise = gameTimer();
   if (card) card.classList.add('show');
+  if(showBtn) showBtn.style.display = 'none';
   const score = document.getElementById('scoreDisplay');
   if (score) score.classList.add('show');
   while (globalTimeleft > 0 && isGameStarted) {
@@ -127,6 +128,7 @@ function endGame() {
   const score = document.getElementById('scoreDisplay');
   if (score) score.classList.remove('show');
   if (card) card.classList.remove('show');
+  if (showBtn) showBtn.style.display = 'block';
   isGameStarted = false;
   userScore = 0;
   globalTimeleft = 60;
