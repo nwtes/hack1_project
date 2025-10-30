@@ -84,7 +84,7 @@ A compact single-page web app that turns a Leaflet world map into a clickable ge
 - Curated question pool: `assets/top65.json` (included in repo).  
 - Portions of code were adapted from small Leaflet examples and public patterns for GeoJSON layer handling — these are standard usage patterns and are attributed to Leaflet documentation and examples.
 
-## 🗺️ Map Data & Attribution
+## Map Data & Attribution
 
 This project uses map tiles from the following sources:
 

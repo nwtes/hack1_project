@@ -21,7 +21,19 @@
  * - guessedCountries, questionTemplates, currentAnswer, isGuessing, etc.: app state
  */
 /** Create the Leaflet map instance */
-const map = L.map('map', { zoomControl: false }).setView([20, 0], 2);
+const bounds = L.latLngBounds(
+  L.latLng(-85, -180),  // Southwest corner
+  L.latLng(85, 180)     // Northeast corner
+);
+
+const map = L.map('map', {
+  zoomControl: false,
+  center: [0, 0],
+  zoom: 2,
+  maxBounds: bounds,
+  maxBoundsViscosity: 1.0,
+  worldCopyJump: false
+}).setView([20, 0], 2);
 var body = document.body
 /** UI elements */
 var card = document.getElementById('infoCard');

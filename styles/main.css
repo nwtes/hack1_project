@@ -179,9 +179,9 @@ html, body {
 }
 
 @media (max-width: 600px) {
-  .timer { right: 8px; left: auto; padding: 6px; gap:8px; }
-  .timer-display { min-width: 58px; font-size: 0.95rem; }
-  .timer-btn { padding: 4px 6px; font-size: 0.85rem; }
+  .timer { right: 12px; left: auto; padding: 6px; gap:8px; top: 12px; }
+  .timer-display { min-width: 58px; font-size: 1rem; }
+  .timer-btn { padding: 6px 8px; font-size: 0.95rem; }
 }
 
 /* Score display - top-left floating number, no background */
@@ -212,7 +212,10 @@ html, body {
 }
 
 @media (max-width: 600px) {
-  .score-display { left: 10px; font-size: 16px; }
+  .score-display { left: 10px; font-size: 28px; top: 12px; }
+  #searchbar-conatiner { left: 50%; right: auto; top: 12px; transform: translateX(-50%); position: fixed; z-index: 9000; width: calc(100% - 32px); }
+  #searchbar { width: 100%; min-width: 0; max-width: none; }
+  .timer { right: 12px; left: auto; top: 12px; }
 }
 
 #searchbar {
@@ -220,7 +223,9 @@ html, body {
   border-radius: 999px;
   border: 1px solid var(--card-border);
   background: var(--ui-surface-contrast);
-  min-width: 320px;
+  min-width: 180px;
+  max-width: 720px;
+  width: auto;
   box-shadow: var(--shadow-strong);
   outline: none;
 }
@@ -529,3 +534,42 @@ body.dark-mode .show-btn.timer-btn {
 /* transient pulse */
 /* Removed transient animation classes and keyframes.
    Keep only persistent correct/wrong styling (colors/stroke). */
+
+/* Modal overlay for end-of-round score */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: block;
+  background: rgba(0,0,0,0.35);
+  z-index: 10000;
+}
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--ui-surface);
+  color: var(--text-color);
+  padding: 18px 20px;
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+  min-width: 280px;
+  max-width: 420px;
+  text-align: center;
+  z-index: 10001;
+}
+.modal h2 { margin-top: 0; }
+.modal-actions { display:flex; gap: 10px; justify-content:center; margin-top:12px; }
+.modal .timer-btn { padding: 8px 12px; border-radius: 8px; }
+
+.in-quiz #searchbar-conatiner { display: none !important; }
+.in-quiz #themeToggle,
+.card.show ~ #themeToggle {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-overlay { transition: none !important; }
+}

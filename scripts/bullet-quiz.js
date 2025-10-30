@@ -87,7 +87,10 @@ function sleep(ms) {
 async function startGame() {
   if (isGameStarted) return;
   isGameStarted = true;
+  // ensure any previous end-of-round modal is closed
+  try { const prev = document.getElementById('endGameModal'); if (prev) prev.remove(); } catch (e) {}
   const timerPromise = gameTimer();
+  try { document.body.classList.add('in-quiz'); } catch (e) {}
   if (card) card.classList.add('show');
   if(showBtn) showBtn.style.display = 'none';
   const score = document.getElementById('scoreDisplay');
@@ -124,17 +127,55 @@ async function startGame() {
  * click resolver so the game loop can fully terminate.
  */
 function endGame() {
+  // capture final score before reset
+  const finalScore = (typeof userScore === 'number') ? userScore : 0;
   if (timerIntervalId) { clearInterval(timerIntervalId); timerIntervalId = null; }
   const score = document.getElementById('scoreDisplay');
   if (score) score.classList.remove('show');
   if (card) card.classList.remove('show');
   if (showBtn) showBtn.style.display = 'block';
+  try { document.body.classList.remove('in-quiz'); } catch (e) {}
   isGameStarted = false;
+  // reset counters
   userScore = 0;
   globalTimeleft = 60;
   const timer = document.getElementById('timerDisplay');
   if (timer) timer.textContent = globalTimeleft;
   if (clickResolver) { clickResolver('TIMEOUT'); clickResolver = null; }
+
+  // show a simple modal with the final score and actions
+  try {
+    let modal = document.getElementById('endGameModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'endGameModal';
+      modal.className = 'modal-overlay';
+      modal.innerHTML = `
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="endGameTitle">
+          <h2 id="endGameTitle">Round complete</h2>
+          <p id="endGameScore">Your score: ${finalScore}</p>
+          <div class="modal-actions">
+            <button id="playAgainBtn" class="timer-btn">Play again</button>
+            <button id="closeModalBtn" class="timer-btn">Close</button>
+          </div>
+        </div>`;
+      document.body.appendChild(modal);
+
+      const playAgain = document.getElementById('playAgainBtn');
+      const closeModal = document.getElementById('closeModalBtn');
+      playAgain.addEventListener('click', () => {
+        try { modal.remove(); } catch (e) {}
+        setTimeout(() => { startGame(); }, 120);
+      });
+      closeModal.addEventListener('click', () => { try { modal.remove(); } catch (e) {} });
+    } else {
+      const scoreEl = document.getElementById('endGameScore');
+      if (scoreEl) scoreEl.textContent = 'Your score: ' + finalScore;
+      modal.style.display = 'block';
+    }
+  } catch (err) {
+    console.warn('endGame modal failed', err);
+  }
 }
 
 /**
