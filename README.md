@@ -6,11 +6,29 @@ A compact single-page web app that turns a Leaflet world map into a clickable ge
 
 ## Live demo / screenshots
 
-- ![landing](screenshots/landing.png) — Landing view with global map and search bar. Value: shows the map-first UI with quick search and visual focus on geography.
-- `screenshots/02-question-card.png` — Question card open with the quiz prompt. Value: demonstrates how the app presents a question and lets the user click countries to answer.
-- `screenshots/04-timer-mode.png` — Timed (bullet) quiz in progress with timer/score UI. Value: shows the timed challenge mode for engagement and spaced repetition.
+### 1) Landing — Map-first UI (light / dark)
+![landing](screenshots/landing.png) ![landing - dark](screenshots/landing-dark.png)
 
-Include small captions under each screenshot highlighting the user benefit (memory reinforcement, low-latency feedback, accessibility, etc.).
+- What you see: Full-screen Leaflet map with centered search and unobtrusive top controls (score & timer).  
+- User value: Provides immediate geographic context and a low-friction entry point — users can search or start guessing without leaving the map.  
+- Notes: Light and dark basemaps are shown to demonstrate theming and alternate tile layers; the UI keeps controls visible without covering map content.
+
+### 2) Question card — Prompt & quick actions (light / dark)
+![question card](screenshots/question-card.png) ![question card - dark](screenshots/question-card-dark.png)
+
+- What you see: The question card slides up from the bottom with a large prompt and action affordances.  
+- User value: Focuses attention on the current question while keeping the map visible for quick, spatial answers (click-to-guess).  
+- Notes: The card is keyboard-accessible and designed to be compact so multiple rounds can be completed quickly.
+
+### 3) Timed (bullet) quiz — Score & pacing UI (light / dark)
+![timed quiz](screenshots/timed-quiz.png) ![timed quiz - dark](screenshots/timed-quiz-dark.png)
+
+- What you see: Timed round in progress with timer display, a small transient delta (±4 seconds) and the floating score indicator.  
+- User value: Adds urgency and spaced repetition — the timer/delta and scoring mechanics encourage quick recall and repeat practice.  
+- Notes: The dark theme intentionally adopts subtler button treatments to reduce glare while preserving clear positive/negative feedback (green/red borders).
+
+
+
 
 ---
 
